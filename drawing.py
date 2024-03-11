@@ -30,27 +30,6 @@ def drawing(Ms, Ma, n, n_out, g, amount, size, is_show_load):
         for j in range(max_cylinder):
             i.append(0)
 
-    # Функция, заносящая вес отражённых фотонов в список MATRIX
-    def get_matrix(x_next, max_x, y_next, max_y, P):
-        MATRIX[floor(x_next * size / max_x)][floor(y_next * size / max_y)] += P
-
-    # Функция, заполняющая список Cylinder
-    def log_at(x, y, max_d, max_r, P, deepest_z):
-        index_1: int = floor(max_cylinder * (deepest_z / max_d))
-        index_2: int = floor(max_cylinder * (sqrt(x * x + y * y) / max_r))
-        if (index_1 < max_cylinder and index_2 < max_cylinder):
-            Cylinder[index_1][index_2] += P
-
-    # Функция, выводящая статистику в консоль и открывающая карты значений (matrix.py)
-    def open():
-        openmatrix(size, max_cylinder, MATRIX, Cylinder)
-        print("Всего фотонов выпущено:", amount, " Фотонов отражено:", photo_count)
-
-    # Количество прошедших фотонов
-    counter = 0
-    # Количество отражённых фотонов
-    photo_count = 0
-
     # Значения максимальных координат по x,y и z
     max_x = 200.0
     max_y = 200.0
@@ -68,6 +47,33 @@ def drawing(Ms, Ma, n, n_out, g, amount, size, is_show_load):
     Gx_start = 0.0
     Gy_start = 0.0
     Gz_start = 1.0
+
+    # Функция, заносящая вес отражённых фотонов в список MATRIX
+    def get_matrix(x_next, max_x, y_next, max_y, P):
+        MATRIX[floor(x_next * size / max_x)][floor(y_next * size / max_y)] += P
+
+    # Функция, заполняющая список Cylinder
+    def log_at(x, y, max_d, max_r, P, deepest_z):
+        index_1: int = floor(max_cylinder * (deepest_z / max_d))
+        index_2: int = floor(max_cylinder * (sqrt(abs(x - x_start) * abs(x - x_start) +
+                                                  abs(y - y_start) * abs(y - y_start)) / max_r))
+        if (index_1 < max_cylinder and index_2 < max_cylinder):
+            Cylinder[index_1][index_2] += P
+            # Отладка:
+            # print("Фотон зафиксирован в радиусе, индекс глубины (1):", index_1, "Индекс дальности (2)", index_2)
+        # else:
+            # Отладка:
+            # print("Не зафиксирован в радиусе")
+
+    # Функция, выводящая статистику в консоль и открывающая карты значений (matrix.py)
+    def open():
+        openmatrix(size, max_cylinder, MATRIX, Cylinder)
+        print("Всего фотонов выпущено:", amount, " Фотонов отражено:", photo_count)
+
+    # Количество прошедших фотонов
+    counter = 0
+    # Количество отражённых фотонов
+    photo_count = 0
 
     # Средняя длина свободного пробега
     lenght_average = 1.0/(Ms + Ma)
@@ -286,6 +292,8 @@ def drawing(Ms, Ma, n, n_out, g, amount, size, is_show_load):
                         log_at(x_next, y_next, max_depth, max_radius, P, deepest_z)
                         # Добавляем один к счётчику отразившихся назад фотонов
                         photo_count += 1
+                        # Отладка:
+                        # print("Фотон №", photo_count, "прилетел в точку: (", x_next, ";", y_next, ") Глубина: ", deepest_z)
                         out_z = True
                         break
                     else:

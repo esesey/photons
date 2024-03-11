@@ -35,8 +35,8 @@ def openmatrix(size, cylinder_size, matrix=[[]], cylinder=[[]]):
     ax1 = figure1.add_subplot(111)
     ax1.set_title("Вес отражённых фотонов")
     im1 = ax1.pcolormesh(matrix_data, cmap='inferno', antialiased=False)
-    plt.xlabel('Расстояние по оси X, мкм')
-    plt.ylabel('Расстояние по оси Y, мкм')
+    plt.xlabel('Расстояние по оси X, мм')
+    plt.ylabel('Расстояние по оси Y, мм')
     figure1.colorbar(im1, ax=ax1, label="Натуральный логарифм от веса фотонов")
     # Создание фигуры (окна), которая будет хранить данные
     # о распределении глубины пролёта фотона в зависимости от расстояния до центра пучка
@@ -44,8 +44,8 @@ def openmatrix(size, cylinder_size, matrix=[[]], cylinder=[[]]):
     ax5 = figure5.add_subplot(111)
     ax5.set_title("Распределение глубины по циллиндру")
     im5 = ax5.pcolormesh(cylinder_data, cmap='inferno', antialiased=False)
-    plt.xlabel('Глубина, мкм')
-    plt.ylabel('Расстояние до центра пучка, мкм')
+    plt.xlabel('Глубина, мм')
+    plt.ylabel('Расстояние до центра пучка, мм')
     figure1.colorbar(im5, ax=ax5, label="Натуральный логарифм от веса фотонов")
 
     # Зацикливание работы matplotlib.pyplot, чтобы окно с данными не закрывалось без указания пользователя
