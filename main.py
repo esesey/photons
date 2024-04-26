@@ -18,7 +18,7 @@ amount_take.grid(row=4, column=1, padx=3, pady=3)
 amount_tip = Hovertip(amount_take, "от 1 до 100m")
 
 # Создание панели ввода параметра коэффициента рассеяния среды
-Ms = DoubleVar(value=0.1)
+Ms = DoubleVar(value=10.0)
 mu_s_label = Label(buttonFrame, text="μs (Коэфф. рассеяния)")
 mu_s_label.grid(row=5, column=1)
 mu_s_take = Entry(buttonFrame, textvariable=Ms, width=10)

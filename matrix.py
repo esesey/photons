@@ -43,9 +43,10 @@ def openmatrix(size, cylinder_size, matrix=[[]], cylinder=[[]]):
     figure5 = plt.figure()
     ax5 = figure5.add_subplot(111)
     ax5.set_title("Распределение глубины по циллиндру")
+    ax5.set_xticklabels([0,5,10,20])
     im5 = ax5.pcolormesh(cylinder_data, cmap='inferno', antialiased=False)
     plt.xlabel('Глубина, мм')
-    plt.ylabel('Расстояние до центра пучка, мм')
+    plt.ylabel('Расстояние до центра пучка, 10^-4 м')
     figure1.colorbar(im5, ax=ax5, label="Натуральный логарифм от веса фотонов")
 
     # Зацикливание работы matplotlib.pyplot, чтобы окно с данными не закрывалось без указания пользователя

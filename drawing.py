@@ -3,6 +3,8 @@ from tkinter import *
 from tkinter import ttk
 from random import uniform
 from math import cos, sin, pi, log, sqrt, acos, asin, tan, floor
+
+import numpy
 from numpy import sign
 from matrix import openmatrix
 
@@ -36,8 +38,8 @@ def drawing(Ms, Ma, n, n_out, g, amount, size, is_show_load):
     max_z = 200.0
 
     # Значения высоты и радиуса циллиндра (сейчас используется кубический цилиндр)
-    max_depth = max_cylinder
-    max_radius = max_cylinder
+    max_depth = 10.0
+    max_radius = 10.0
 
     # Начальные x, y и z
     x_start = 100.0
@@ -50,7 +52,10 @@ def drawing(Ms, Ma, n, n_out, g, amount, size, is_show_load):
 
     # Функция, заносящая вес отражённых фотонов в список MATRIX
     def get_matrix(x_next, max_x, y_next, max_y, P):
-        MATRIX[floor(x_next * size / max_x)][floor(y_next * size / max_y)] += P
+        index_1: int = int(size/2) + floor((x_next - x_start) * size / (2 * max_radius))
+        index_2: int = int(size/2) + floor((y_next - y_start) * size / (2 * max_radius))
+        if (index_1 < size and index_2 < size and index_1 > 0 and index_2 > 0):
+            MATRIX[index_1][index_2] += P
 
     # Функция, заполняющая список Cylinder
     def log_at(x, y, max_d, max_r, P, deepest_z):
@@ -68,6 +73,8 @@ def drawing(Ms, Ma, n, n_out, g, amount, size, is_show_load):
     # Функция, выводящая статистику в консоль и открывающая карты значений (matrix.py)
     def open():
         openmatrix(size, max_cylinder, MATRIX, Cylinder)
+        numpy.savetxt('matrix1.txt', MATRIX)
+        numpy.savetxt('matrix2.txt', Cylinder)
         print("Всего фотонов выпущено:", amount, " Фотонов отражено:", photo_count)
 
     # Количество прошедших фотонов
