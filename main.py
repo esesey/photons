@@ -2,11 +2,12 @@ from tkinter import *
 from tkinter import ttk
 from drawing import drawing
 from idlelib.tooltip import Hovertip
+from tkinter.filedialog import askopenfile
 
 # Создание стартового окна и рамки для кнопок
 window = Tk()
 window.title("Панель управления")
-window.geometry("300x460")
+window.geometry("330x605")
 buttonFrame = Frame(window)
 
 # Создание панели ввода параметра количества выпускаемых фотонов
@@ -23,7 +24,7 @@ mu_s_label = Label(buttonFrame, text="μs (Коэфф. рассеяния)")
 mu_s_label.grid(row=5, column=1)
 mu_s_take = Entry(buttonFrame, textvariable=Ms, width=10)
 mu_s_take.grid(row=6, column=1, padx=3, pady=3)
-mu_s_tip = Hovertip(mu_s_take, "от ~0 до 10")
+mu_s_tip = Hovertip(mu_s_take, "от ~0 до 20")
 
 # Создание панели ввода параметра коэффициента поглощения среды
 Ma = DoubleVar(value=0.002)
@@ -57,13 +58,21 @@ g_take = Entry(buttonFrame, textvariable=g, width=10)
 g_take.grid(row=14, column=1, padx=3, pady=3)
 g_tip = Hovertip(g_take, "от ~0 до 1")
 
-# Создание панели ввода размера списка со значениями для вернувшихся фотонов
-size = IntVar(value=200)
-size_label = Label(buttonFrame, text="Размер матрицы возврата")
-size_label.grid(row=15, column=1)
-size_take = Entry(buttonFrame, textvariable=size, width=10)
-size_take.grid(row=16, column=1, padx=3, pady=3)
-size_tip = Hovertip(size_take, "от 1 до 400")
+# Создание панели ввода параметра максимальной глубины
+max_d = DoubleVar(value=20)
+max_d_label = Label(buttonFrame, text="Максимальная глубина")
+max_d_label.grid(row=17, column=1)
+max_d_take = Entry(buttonFrame, textvariable=max_d, width=10)
+max_d_take.grid(row=18, column=1, padx=3, pady=3)
+max_d_tip = Hovertip(max_d_take, "от 1 до 200")
+
+# Создание панели ввода параметра максимального радиуса
+max_r = DoubleVar(value=20)
+max_r_label = Label(buttonFrame, text="Максимальный радиус")
+max_r_label.grid(row=19, column=1)
+max_r_take = Entry(buttonFrame, textvariable=max_r, width=10)
+max_r_take.grid(row=20, column=1, padx=3, pady=3)
+max_r_tip = Hovertip(max_r_take, "от 1 до 100")
 
 # Создание кнопки выбора, показывать ли окно с прогрессом выполнения программы
 # Может быть полезно при разных ситуациях, т.к. прогресс содержит
@@ -79,19 +88,32 @@ is_show_load_tip = Hovertip(is_show_load_check, 'Окно прогресса с�
 def start():
     drawing(float(mu_s_take.get()), float(mu_a_take.get()), float(n_take.get()),
             float(n_out_take.get()), float(g_take.get()), int(amount_take.get()),
-            int(size_take.get()), bool(is_show_load.get()))
+            bool(is_show_load.get()), int(max_d.get()), int(max_r_take.get()))
+
+def takeFromFile():
+    file = askopenfile(parent=buttonFrame, filetypes=[('Text Files', '*.txt')])
+    if file is not None:
+        content = file.read()
+        print(content)
 
 # Создание приветственной надписи
-info = Label(buttonFrame, text="Добро пожаловать! Выберите настройки:")
-info.grid(row=0, column=1)
+info = Label(buttonFrame, font='Bold', text="Добро пожаловать! Выберите настройки:")
+info.grid(row=0, column=1, pady=10)
+
+map_label = Label(buttonFrame, font='Bold', text="Параметры для отрисовки карт")
+map_label.grid(row=16, column=1, pady=10)
 
 # Создание кнопки, активирующей функцию start
 button2 = Button(buttonFrame, text="Нарисовать траектории", command=start)
-button2.grid(row=1, column=1, padx=10, pady=10)
+button2.grid(row=15, column=1, padx=10, pady=10)
+
+# Создание кнопки, вызывающая функцию takeFromFile
+button3 = Button(buttonFrame, text="Построить карту из файла", command=takeFromFile)
+button3.grid(row=21, column=1, padx=10, pady=10)
 
 # Создание кнопки, закрывающей основное окно
 button5 = Button(buttonFrame, text="Выйти из программы", command=window.destroy)
-button5.grid(row=17, column=1, padx=10, pady=10)
+button5.grid(row=22, column=1)
 
 # Компиляция рамки для кнопок и её прилипание к верхней границе
 buttonFrame.pack(anchor="n")

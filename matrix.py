@@ -3,7 +3,7 @@ from numpy import log
 
 # Функция, выводящая окна с информацией об отражённых назад из среды фотонах
 # Информация берётся напрямую из drawing.py
-def openmatrix(size, cylinder_size, matrix=[[]], cylinder=[[]]):
+def openmatrix(size, cylinder_size, max_depth, max_radius, matrix=[[]], cylinder=[[]]):
     # Инициализация списков-дублёров переданных списков
     matrix_data = []
     cylinder_data = []
@@ -43,10 +43,11 @@ def openmatrix(size, cylinder_size, matrix=[[]], cylinder=[[]]):
     figure5 = plt.figure()
     ax5 = figure5.add_subplot(111)
     ax5.set_title("Распределение глубины по циллиндру")
-    ax5.set_xticklabels([0,5,10,20])
+    ax5.set_xticklabels([0, max_depth / 5, 2 * max_depth / 5, 3 * max_depth / 5, 4 * max_depth / 5, max_depth])
+    ax5.set_yticklabels([0, max_radius / 5, 2 * max_radius / 5, 3 * max_radius / 5, 4 * max_radius / 5, max_radius])
     im5 = ax5.pcolormesh(cylinder_data, cmap='inferno', antialiased=False)
     plt.xlabel('Глубина, мм')
-    plt.ylabel('Расстояние до центра пучка, 10^-4 м')
+    plt.ylabel('Расстояние до центра пучка, мм')
     figure1.colorbar(im5, ax=ax5, label="Натуральный логарифм от веса фотонов")
 
     # Зацикливание работы matplotlib.pyplot, чтобы окно с данными не закрывалось без указания пользователя

@@ -11,13 +11,14 @@ from matrix import openmatrix
 # Основная функция, использует значения переменных, переданных из главного меню (main.py)
 # Создаёт окно, на котором показываются траектории первых 100 пролетевших фотонов
 # Рассчитывает полёт всех фотонов, а так же заносит данные о глубине и весе в соответствующие списки
-def drawing(Ms, Ma, n, n_out, g, amount, size, is_show_load):
+def drawing(Ms, Ma, n, n_out, g, amount, is_show_load, max_deep_int, max_rad_int):
     # Инициализация списков обратного отражения, MATRIX для занесения значений веса,
     # Cylinder для значений зависимости глубины пролёта фотона от расстояния до центра пучка
     MATRIX = []
     Cylinder = []
     # Рассчёт длины ребра циллиндра в зависимости от размера матрицы отражения
     # max_cylinder = floor(size/2)
+    size = 200
     max_cylinder = 100
 
     # Задание размера списков и заполнение пустыми значениями
@@ -37,9 +38,9 @@ def drawing(Ms, Ma, n, n_out, g, amount, size, is_show_load):
     max_y = 200.0
     max_z = 200.0
 
-    # Значения высоты и радиуса циллиндра (сейчас используется кубический цилиндр)
-    max_depth = 10.0
-    max_radius = 10.0
+    # Значения высоты и радиуса циллиндра, переданные параметрами
+    max_depth = float(max_deep_int)
+    max_radius = float(max_rad_int)
 
     # Начальные x, y и z
     x_start = 100.0
@@ -51,17 +52,17 @@ def drawing(Ms, Ma, n, n_out, g, amount, size, is_show_load):
     Gz_start = 1.0
 
     # Функция, заносящая вес отражённых фотонов в список MATRIX
-    def get_matrix(x_next, max_x, y_next, max_y, P):
+    def get_matrix(x_next, y_next, P):
         index_1: int = int(size/2) + floor((x_next - x_start) * size / (2 * max_radius))
         index_2: int = int(size/2) + floor((y_next - y_start) * size / (2 * max_radius))
         if (index_1 < size and index_2 < size and index_1 > 0 and index_2 > 0):
             MATRIX[index_1][index_2] += P
 
     # Функция, заполняющая список Cylinder
-    def log_at(x, y, max_d, max_r, P, deepest_z):
-        index_1: int = floor(max_cylinder * (deepest_z / max_d))
+    def log_at(x, y, P, deepest_z):
+        index_1: int = floor(max_cylinder * (deepest_z / max_depth))
         index_2: int = floor(max_cylinder * (sqrt(abs(x - x_start) * abs(x - x_start) +
-                                                  abs(y - y_start) * abs(y - y_start)) / max_r))
+                                                  abs(y - y_start) * abs(y - y_start)) / max_radius))
         if (index_1 < max_cylinder and index_2 < max_cylinder):
             Cylinder[index_1][index_2] += P
             # Отладка:
@@ -70,17 +71,22 @@ def drawing(Ms, Ma, n, n_out, g, amount, size, is_show_load):
             # Отладка:
             # print("Не зафиксирован в радиусе")
 
-    # Функция, выводящая статистику в консоль и открывающая карты значений (matrix.py)
-    def open():
-        openmatrix(size, max_cylinder, MATRIX, Cylinder)
-        numpy.savetxt('matrix1.txt', MATRIX)
-        numpy.savetxt('matrix2.txt', Cylinder)
-        print("Всего фотонов выпущено:", amount, " Фотонов отражено:", photo_count)
-
     # Количество прошедших фотонов
     counter = 0
     # Количество отражённых фотонов
     photo_count = 0
+
+    # Функция, выводящая статистику в консоль, сохраняющая файлы с матрицами
+    # и открывающая карты значений (matrix.py)
+    def open():
+        numpy.savetxt('archiv/matrix_ref ' + '[' + 'amount = ' + str(amount) + ', Ms = ' + str(Ms) + ', Ma = ' + str(Ma)
+                      + ', n = ' + str(n) + ', n_out = ' + str(n_out) + ', g = ' + str(g) + '] ' + '.txt', MATRIX)
+        numpy.savetxt('archiv/matrix_dist ' + '[' + 'amount = ' + str(amount) + ', Ms = ' + str(Ms) + ', Ma = ' + str(Ma)
+                      + ', n = ' + str(n) + ', n_out = ' + str(n_out) + ', g = ' + str(g) + '] ' + '.txt', Cylinder)
+        print("Всего фотонов выпущено:", amount, " Фотонов отражено:", photo_count)
+        openmatrix(size, max_cylinder, max_depth, max_radius, MATRIX, Cylinder)
+
+
 
     # Средняя длина свободного пробега
     lenght_average = 1.0/(Ms + Ma)
@@ -295,8 +301,8 @@ def drawing(Ms, Ma, n, n_out, g, amount, size, is_show_load):
                     # Отражение не произошло, фотон вылетел, если он вылетел в обратную сторону,
                     # фиксируем его данные с помощью функций.
                     if z_next <= 0:
-                        get_matrix(x_next, max_x, y_next, max_y, P)
-                        log_at(x_next, y_next, max_depth, max_radius, P, deepest_z)
+                        get_matrix(x_next, y_next, P)
+                        log_at(x_next, y_next, P, deepest_z)
                         # Добавляем один к счётчику отразившихся назад фотонов
                         photo_count += 1
                         # Отладка:
