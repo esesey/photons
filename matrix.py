@@ -34,6 +34,10 @@ def openmatrix(size, cylinder_size, max_depth, max_radius, matrix=[[]], cylinder
     figure1 = plt.figure()
     ax1 = figure1.add_subplot(111)
     ax1.set_title("Вес отражённых фотонов")
+    ax1.set_xticklabels([0, max_radius / 8, 2 * max_radius / 8, 3 * max_radius / 8, 4 * max_radius / 8,
+                         5 * max_radius / 8, 6 * max_radius / 8, 7 * max_radius / 8, max_radius])
+    ax1.set_yticklabels([0, max_radius / 8, 2 * max_radius / 8, 3 * max_radius / 8, 4 * max_radius / 8,
+                         5 * max_radius / 8, 6 * max_radius / 8, 7 * max_radius / 8, max_radius])
     im1 = ax1.pcolormesh(matrix_data, cmap='inferno', antialiased=False)
     plt.xlabel('Расстояние по оси X, мм')
     plt.ylabel('Расстояние по оси Y, мм')
