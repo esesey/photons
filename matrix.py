@@ -52,7 +52,7 @@ def openmatrix(size, cylinder_size, max_depth, max_radius, matrix=[[]], cylinder
     im5 = ax5.pcolormesh(cylinder_data, cmap='inferno', antialiased=False)
     plt.xlabel('Глубина, мм')
     plt.ylabel('Расстояние до центра пучка, мм')
-    figure1.colorbar(im5, ax=ax5, label="Натуральный логарифм от веса фотонов")
+    figure5.colorbar(im5, ax=ax5, label="Натуральный логарифм от веса фотонов")
 
     # Зацикливание работы matplotlib.pyplot, чтобы окно с данными не закрывалось без указания пользователя
     plt.show()

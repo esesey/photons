@@ -16,7 +16,7 @@ def drawing(Ms, Ma, n, n_out, g, amount, is_show_load, max_deep_int, max_rad_int
     # Cylinder для значений зависимости глубины пролёта фотона от расстояния до центра пучка
     MATRIX = []
     Cylinder = []
-    # Рассчёт длины ребра циллиндра в зависимости от размера матрицы отражения
+    # Рассчёт длины радиуса циллиндра в зависимости от размера матрицы отражения
     # max_cylinder = floor(size/2)
     size = 200
     max_cylinder = 100
@@ -79,10 +79,12 @@ def drawing(Ms, Ma, n, n_out, g, amount, is_show_load, max_deep_int, max_rad_int
     # Функция, выводящая статистику в консоль, сохраняющая файлы с матрицами
     # и открывающая карты значений (matrix.py)
     def open():
-        numpy.savetxt('archiv/matrix_ref ' + '[' + 'amount = ' + str(amount) + ', Ms = ' + str(Ms) + ', Ma = ' + str(Ma)
-                      + ', n = ' + str(n) + ', n_out = ' + str(n_out) + ', g = ' + str(g) + '] ' + '.txt', MATRIX)
-        numpy.savetxt('archiv/matrix_dist ' + '[' + 'amount = ' + str(amount) + ', Ms = ' + str(Ms) + ', Ma = ' + str(Ma)
-                      + ', n = ' + str(n) + ', n_out = ' + str(n_out) + ', g = ' + str(g) + '] ' + '.txt', Cylinder)
+        numpy.savetxt('archive/matrix_ref ' + '[' + 'amount = ' + str(amount) + ', Ms = ' + str(Ms) + ', Ma = ' + str(Ma)
+                      + ', n = ' + str(n) + ', n_out = ' + str(n_out) + ', g = ' + str(g)
+                      + ', rad = ' + str(max_radius) + ', dep = ' + str(max_depth) + ']' + '.txt', MATRIX)
+        numpy.savetxt('archive/matrix_dis ' + '[' + 'amount = ' + str(amount) + ', Ms = ' + str(Ms) + ', Ma = ' + str(Ma)
+                      + ', n = ' + str(n) + ', n_out = ' + str(n_out) + ', g = ' + str(g)
+                      + ', rad = ' + str(max_radius) + ', dep = ' + str(max_depth) + ']' + '.txt', Cylinder)
         print("Всего фотонов выпущено:", amount, " Фотонов отражено:", photo_count)
         openmatrix(size, max_cylinder, max_depth, max_radius, MATRIX, Cylinder)
 

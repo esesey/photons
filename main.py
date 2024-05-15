@@ -3,6 +3,7 @@ from tkinter import ttk
 from drawing import drawing
 from idlelib.tooltip import Hovertip
 from tkinter.filedialog import askopenfile
+from matrix_rebuild import rebuild
 
 # Создание стартового окна и рамки для кнопок
 window = Tk()
@@ -94,7 +95,8 @@ def takeFromFile():
     file = askopenfile(parent=buttonFrame, filetypes=[('Text Files', '*.txt')])
     if file is not None:
         content = file.read()
-        print(content)
+        name = file.name
+        rebuild(name, content)
 
 # Создание приветственной надписи
 info = Label(buttonFrame, font='Bold', text="Добро пожаловать! Выберите настройки:")
