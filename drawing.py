@@ -258,6 +258,9 @@ def drawing(Ms, Ma, n, n_out, g, amount, is_show_load, max_deep_int, max_rad_int
 
             # Рассеяние: фотон теряет часть "веса"
             P = P - P_diff
+            # fix: при больших Ma фотон мог потерять веса больше, чем имеет
+            if P < 0:
+                P = 0
 
             # Проверка вылета по y-координате
             if y_next < 0 or y_next > max_y:

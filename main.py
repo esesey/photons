@@ -36,7 +36,7 @@ mu_a_take.grid(row=8, column=1, padx=3, pady=3)
 mu_a_tip = Hovertip(mu_a_take, "от ~0 до 0.5")
 
 # Создание панели ввода параметра коэффициента преломления среды
-n = DoubleVar(value=1.5)
+n = DoubleVar(value=1.37)
 n_label = Label(buttonFrame, text="n (Коэфф. преломления среды)")
 n_label.grid(row=9, column=1)
 n_take = Entry(buttonFrame, textvariable=n, width=10)
