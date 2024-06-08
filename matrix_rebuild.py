@@ -3,21 +3,21 @@ from numpy import log
 
 # Данный модуль используется для построения только одной матрицы по txt файлу
 
-def rebuild(name, data):
+def rebuild(name, data, fix_radius):
     size = 200
     cylinder_size = 100
     map_type = name[name.index('_') + 1:name.index('_') + 4]
     rad = float(name[name.index('rad = ') + 6:len(name)].split(',')[0])
     dep = float(name[name.index('dep = ') + 6:len(name)].split(']')[0])
     matrix_data = []
+    plot_data_X = []
+    plot_data_Y = []
     m_data = data.split()
 
     if map_type == 'ref':
-
         for i in range(size):
             z = []
             matrix_data.append(z)
-            print('hi')
             for j in range(size):
                 k = log(float(m_data[i * size + j]) + 0.001)
                 z.append(k)
@@ -43,7 +43,11 @@ def rebuild(name, data):
             for j in range(cylinder_size):
                 k = log(float(m_data[i * cylinder_size + j]) + 0.001)
                 z.append(k)
-        print('hi there')
+                if (j == fix_radius):
+                    plot_data_X.append(i*dep/100)
+                    plot_data_Y.append(float(m_data[i * cylinder_size + j]))
+                    print(float(m_data[i * cylinder_size + j]))
+
         figure5 = plt.figure()
         ax5 = figure5.add_subplot(111)
         ax5.set_title("Распределение глубины по циллиндру")
@@ -53,8 +57,16 @@ def rebuild(name, data):
         plt.xlabel('Глубина, мм')
         plt.ylabel('Расстояние до центра пучка, мм')
         figure5.colorbar(im5, ax=ax5, label="Натуральный логарифм от веса фотонов")
+
+        figure6 = plt.figure()
+        ax6 = figure6.add_subplot(111)
+        ax6.set_title('Распределение веса от глубины при радиусе ' + str(fix_radius))
+        ax6.plot(plot_data_X, plot_data_Y)
+        plt.xlabel('Глубина, мм')
+        plt.ylabel('Вес фотонов')
+
         plt.show()
 
     if map_type != 'dis' or map_type != 'ref':
-        print('Raised error while writing map type')
+        print('Raised error while reading map type')
 

@@ -11,7 +11,7 @@ from matrix import openmatrix
 # Основная функция, использует значения переменных, переданных из главного меню (main.py)
 # Создаёт окно, на котором показываются траектории первых 100 пролетевших фотонов
 # Рассчитывает полёт всех фотонов, а так же заносит данные о глубине и весе в соответствующие списки
-def drawing(Ms, Ma, n, n_out, g, amount, is_show_load, max_deep_int, max_rad_int):
+def drawing(Ms, Ma, n, n_out, g, amount, is_show_load, max_deep_int, max_rad_int, fix_rad):
     # Инициализация списков обратного отражения, MATRIX для занесения значений веса,
     # Cylinder для значений зависимости глубины пролёта фотона от расстояния до центра пучка
     MATRIX = []
@@ -86,7 +86,7 @@ def drawing(Ms, Ma, n, n_out, g, amount, is_show_load, max_deep_int, max_rad_int
                       + ', n = ' + str(n) + ', n_out = ' + str(n_out) + ', g = ' + str(g)
                       + ', rad = ' + str(max_radius) + ', dep = ' + str(max_depth) + ']' + '.txt', Cylinder)
         print("Всего фотонов выпущено:", amount, " Фотонов отражено:", photo_count)
-        openmatrix(size, max_cylinder, max_depth, max_radius, MATRIX, Cylinder)
+        openmatrix(size, max_cylinder, max_depth, max_radius, fix_rad, MATRIX, Cylinder)
 
 
 

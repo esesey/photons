@@ -8,7 +8,7 @@ from matrix_rebuild import rebuild
 # Создание стартового окна и рамки для кнопок
 window = Tk()
 window.title("Панель управления")
-window.geometry("330x605")
+window.geometry("330x650")
 buttonFrame = Frame(window)
 
 # Создание панели ввода параметра количества выпускаемых фотонов
@@ -75,6 +75,14 @@ max_r_take = Entry(buttonFrame, textvariable=max_r, width=10)
 max_r_take.grid(row=20, column=1, padx=3, pady=3)
 max_r_tip = Hovertip(max_r_take, "от 1 до 100")
 
+# Создание панели ввода радиуса для фиксирования
+fix_r = DoubleVar(value=10)
+fix_r_label = Label(buttonFrame, text="Зафиксировать радиус")
+fix_r_label.grid(row=21, column=1)
+fix_r_take = Entry(buttonFrame, textvariable=fix_r, width=10)
+fix_r_take.grid(row=22, column=1, padx=3, pady=3)
+fix_r_tip = Hovertip(fix_r_take, "от 1 до 100")
+
 # Создание кнопки выбора, показывать ли окно с прогрессом выполнения программы
 # Может быть полезно при разных ситуациях, т.к. прогресс содержит
 # Интересную информацию, но отнимает производительность
@@ -89,14 +97,14 @@ is_show_load_tip = Hovertip(is_show_load_check, 'Окно прогресса с�
 def start():
     drawing(float(mu_s_take.get()), float(mu_a_take.get()), float(n_take.get()),
             float(n_out_take.get()), float(g_take.get()), int(amount_take.get()),
-            bool(is_show_load.get()), int(max_d.get()), int(max_r_take.get()))
+            bool(is_show_load.get()), int(max_d.get()), int(max_r_take.get()), int(fix_r_take.get()))
 
 def takeFromFile():
     file = askopenfile(parent=buttonFrame, filetypes=[('Text Files', '*.txt')])
     if file is not None:
         content = file.read()
         name = file.name
-        rebuild(name, content)
+        rebuild(name, content, int(fix_r_take.get()))
 
 # Создание приветственной надписи
 info = Label(buttonFrame, font='Bold', text="Добро пожаловать! Выберите настройки:")
@@ -111,11 +119,11 @@ button2.grid(row=15, column=1, padx=10, pady=10)
 
 # Создание кнопки, вызывающая функцию takeFromFile
 button3 = Button(buttonFrame, text="Построить карту из файла", command=takeFromFile)
-button3.grid(row=21, column=1, padx=10, pady=10)
+button3.grid(row=23, column=1, padx=10, pady=10)
 
 # Создание кнопки, закрывающей основное окно
 button5 = Button(buttonFrame, text="Выйти из программы", command=window.destroy)
-button5.grid(row=22, column=1)
+button5.grid(row=24, column=1)
 
 # Компиляция рамки для кнопок и её прилипание к верхней границе
 buttonFrame.pack(anchor="n")

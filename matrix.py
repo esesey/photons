@@ -3,7 +3,7 @@ from numpy import log
 
 # Функция, выводящая окна с информацией об отражённых назад из среды фотонах
 # Информация берётся напрямую из drawing.py
-def openmatrix(size, cylinder_size, max_depth, max_radius, matrix=[[]], cylinder=[[]]):
+def openmatrix(size, cylinder_size, max_depth, max_radius, fix_radius, matrix=[[]], cylinder=[[]]):
     # Инициализация списков-дублёров переданных списков
     matrix_data = []
     cylinder_data = []
