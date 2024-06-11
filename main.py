@@ -76,7 +76,7 @@ max_r_take.grid(row=20, column=1, padx=3, pady=3)
 max_r_tip = Hovertip(max_r_take, "от 1 до 100")
 
 # Создание панели ввода радиуса для фиксирования
-fix_r = DoubleVar(value=10)
+fix_r = DoubleVar(value=4.9)
 fix_r_label = Label(buttonFrame, text="Зафиксировать радиус")
 fix_r_label.grid(row=21, column=1)
 fix_r_take = Entry(buttonFrame, textvariable=fix_r, width=10)
@@ -97,14 +97,14 @@ is_show_load_tip = Hovertip(is_show_load_check, 'Окно прогресса с�
 def start():
     drawing(float(mu_s_take.get()), float(mu_a_take.get()), float(n_take.get()),
             float(n_out_take.get()), float(g_take.get()), int(amount_take.get()),
-            bool(is_show_load.get()), int(max_d.get()), int(max_r_take.get()), int(fix_r_take.get()))
+            bool(is_show_load.get()), int(max_d.get()), int(max_r_take.get()), float(fix_r_take.get()))
 
 def takeFromFile():
     file = askopenfile(parent=buttonFrame, filetypes=[('Text Files', '*.txt')])
     if file is not None:
         content = file.read()
         name = file.name
-        rebuild(name, content, int(fix_r_take.get()))
+        rebuild(name, content, float(fix_r_take.get()))
 
 # Создание приветственной надписи
 info = Label(buttonFrame, font='Bold', text="Добро пожаловать! Выберите настройки:")

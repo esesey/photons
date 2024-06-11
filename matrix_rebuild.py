@@ -13,6 +13,7 @@ def rebuild(name, data, fix_radius):
     plot_data_X = []
     plot_data_Y = []
     m_data = data.split()
+    sum = 0
 
     if map_type == 'ref':
         for i in range(size):
@@ -43,10 +44,11 @@ def rebuild(name, data, fix_radius):
             for j in range(cylinder_size):
                 k = log(float(m_data[i * cylinder_size + j]) + 0.001)
                 z.append(k)
-                if (j == fix_radius):
-                    plot_data_X.append(i*dep/100)
+                if (j*rad/cylinder_size == fix_radius and i*dep/cylinder_size<=2):
+                    plot_data_X.append(i*dep/cylinder_size)
                     plot_data_Y.append(float(m_data[i * cylinder_size + j]))
-                    print(float(m_data[i * cylinder_size + j]))
+                    print('Глубина', i*dep/cylinder_size, "; Вес", float(m_data[i * cylinder_size + j]))
+                    sum += float(m_data[i * cylinder_size + j])
 
         figure5 = plt.figure()
         ax5 = figure5.add_subplot(111)
@@ -65,8 +67,9 @@ def rebuild(name, data, fix_radius):
         plt.xlabel('Глубина, мм')
         plt.ylabel('Вес фотонов')
 
+        print(sum)
         plt.show()
 
-    if map_type != 'dis' or map_type != 'ref':
+    if map_type != 'dis' and map_type != 'ref':
         print('Raised error while reading map type')
 
