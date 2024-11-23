@@ -47,8 +47,6 @@ def rebuild(name, data, fix_radius):
                 if (j*rad/cylinder_size == fix_radius and i*dep/cylinder_size<=2):
                     plot_data_X.append(i*dep/cylinder_size)
                     plot_data_Y.append(float(m_data[i * cylinder_size + j]))
-                    print('Глубина', i*dep/cylinder_size, "; Вес", float(m_data[i * cylinder_size + j]))
-                    sum += float(m_data[i * cylinder_size + j])
 
         figure5 = plt.figure()
         ax5 = figure5.add_subplot(111)
@@ -62,10 +60,41 @@ def rebuild(name, data, fix_radius):
 
         figure6 = plt.figure()
         ax6 = figure6.add_subplot(111)
-        ax6.set_title('Распределение веса от глубины при радиусе ' + str(fix_radius))
+        ax6.set_title('Распределение веса от глубины при радиусе' + str(fix_radius))
         ax6.plot(plot_data_X, plot_data_Y)
         plt.xlabel('Глубина, мм')
         plt.ylabel('Вес фотонов')
+
+        # Эти данные и графики нужны были для демонстрации зависимостей
+        # data1x = [0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0]
+        # data1y = [0.1, 0.1, 0.2, 0.2, 0.3, 0.3, 0.3, 0.4, 0.4, 0.4]
+        #
+        # data2x = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
+        # data2y = [0.2, 0.3, 0.5, 0.6, 0.8, 0.9, 1.0, 1.0]
+        #
+        # data3x = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]
+        # data3y = [0.1, 0.3, 0.5, 0.6, 0.8, 1.0, 1.0, 1.2, 1.0, 1.4]
+        #
+        # figure7 = plt.figure()
+        # ax7 = figure7.add_subplot(111)
+        # ax7.set_title('Достигаемая глубина от расстояния до источника λ=530нм')
+        # ax7.plot(data1x, data1y)
+        # plt.xlabel('Расстояние источник-детектор, мм')
+        # plt.ylabel('Достигаемая глубина, мм')
+        #
+        # figure8 = plt.figure()
+        # ax8 = figure8.add_subplot(111)
+        # ax8.set_title('Достигаемая глубина от расстояния до источника λ=655нм')
+        # ax8.plot(data2x, data2y)
+        # plt.xlabel('Расстояние источник-детектор, мм')
+        # plt.ylabel('Достигаемая глубина, мм')
+        #
+        # figure9 = plt.figure()
+        # ax9 = figure9.add_subplot(111)
+        # ax9.set_title('Достигаемая глубина от расстояния до источника λ=940нм')
+        # ax9.plot(data3x, data3y)
+        # plt.xlabel('Расстояние источник-детектор, мм')
+        # plt.ylabel('Достигаемая глубина, мм')
 
         print(sum)
         plt.show()
