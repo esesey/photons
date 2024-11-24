@@ -3,9 +3,8 @@ from tkinter import *
 from tkinter import ttk
 from math import sqrt,  floor
 
-import numpy
-from matrix import openmatrix
 from photon import photon_calculation
+from get_result import open
 
 # Основная функция, использует значения переменных, переданных из главного меню (main.py)
 # Создаёт окно, на котором показываются траектории первых 100 пролетевших фотонов
@@ -64,30 +63,11 @@ def drawing(Ms, Ma, n, n_out, g, amount, is_show_load, max_deep_int, max_rad_int
                                                   abs(y - y_start) * abs(y - y_start)) / max_radius))
         if (index_1 < max_cylinder and index_2 < max_cylinder):
             Cylinder[index_1][index_2] += P
-            # Отладка:
-            # print("Фотон зафиксирован в радиусе, индекс глубины (1):", index_1, "Индекс дальности (2)", index_2)
-        # else:
-            # Отладка:
-            # print("Не зафиксирован в радиусе")
 
     # Количество прошедших фотонов
     counter = 0
     # Количество отражённых фотонов
     photo_count = 0
-
-    # Функция, выводящая статистику в консоль, сохраняющая файлы с матрицами
-    # и открывающая карты значений (matrix.py)
-    def open():
-        numpy.savetxt('archive/matrix_ref ' + '[' + 'amount = ' + str(amount) + ', Ms = ' + str(Ms) + ', Ma = ' + str(Ma)
-                      + ', n = ' + str(n) + ', n_out = ' + str(n_out) + ', g = ' + str(g)
-                      + ', rad = ' + str(max_radius) + ', dep = ' + str(max_depth) + ']' + '.txt', MATRIX)
-        numpy.savetxt('archive/matrix_dis ' + '[' + 'amount = ' + str(amount) + ', Ms = ' + str(Ms) + ', Ma = ' + str(Ma)
-                      + ', n = ' + str(n) + ', n_out = ' + str(n_out) + ', g = ' + str(g)
-                      + ', rad = ' + str(max_radius) + ', dep = ' + str(max_depth) + ']' + '.txt', Cylinder)
-        print("Всего фотонов выпущено:", amount, " Фотонов отражено:", photo_count)
-        openmatrix(size, max_cylinder, max_depth, max_radius, fix_rad, MATRIX, Cylinder)
-
-
 
     # Средняя длина свободного пробега
     length_average = 1.0/(Ms + Ma)
@@ -134,6 +114,23 @@ def drawing(Ms, Ma, n, n_out, g, amount, is_show_load, max_deep_int, max_rad_int
         # Компиляция рамки загрузки и её прилипание к верхней границе
         load_frame.pack(anchor="n")
 
+    def loading_update(counter, amount, photo_count):
+        if (not is_show_load): return
+        if (counter % (amount / 1000) == 0):
+            # Обновление прогресса для окна загрузки
+            load_pr['value'] = counter
+            percent_number.configure(text=int(counter * 100 / amount))
+            count_number.configure(text=counter)
+            ref_count_number.configure(text=photo_count)
+            loading.update()
+            # По достижению загрузки за один фотон до конца, числа становятся конечными
+        if (counter == (amount - 1)):
+            load_pr['value'] = amount
+            percent_number.configure(text=100)
+            count_number.configure(text=amount)
+            ref_count_number.configure(text=photo_count)
+            loading.update()
+
     # Создание главного окна и холста с траекториями
     root = Tk()
     root.title('Траектории')
@@ -144,7 +141,12 @@ def drawing(Ms, Ma, n, n_out, g, amount, is_show_load, max_deep_int, max_rad_int
     dr_frame = Frame(root)
 
     # Cоздание кнопки, вызывающей функцию open
-    show_button = Button(dr_frame, text="Открыть матрицу отражения", command=open)
+    show_button = Button(dr_frame, text="Открыть матрицу отражения", command=open(
+        MATRIX, Cylinder,
+        Ma, Ms, n, n_out, g,
+        amount, size, fix_rad, photo_count,
+        max_radius, max_depth, max_cylinder
+    ))
     show_button.grid(row=0, column=1, padx=3, pady=3)
     # Cоздание кнопки, закрывающей текущее окно с траекториями
     quit_pic_button = Button(dr_frame, text="Закрыть картинку", command=root.destroy)
@@ -156,23 +158,7 @@ def drawing(Ms, Ma, n, n_out, g, amount, is_show_load, max_deep_int, max_rad_int
     # Основной цикл рассчёта полёта фотонов (1 итерация = 1 фотон)
     while counter < amount:
         # Обновление прогресса загрузки происходит только если разрешён показ загрузки
-        # Компилятор Питона выдаёт WARN из-за того, что инициализация параметров
-        # окна загрузки скрыта под таким же условием
-        if (is_show_load):
-            if (counter%(amount/1000)==0):
-                # Обновление прогресса для окна загрузки
-                load_pr['value'] = counter
-                percent_number.configure(text=int(counter * 100 / amount))
-                count_number.configure(text=counter)
-                ref_count_number.configure(text=photo_count)
-                loading.update()
-            # По достижению загрузки за один фотон до конца, числа становятся конечными
-            if (counter == (amount - 1)):
-                load_pr['value'] = amount
-                percent_number.configure(text=100)
-                count_number.configure(text=amount)
-                ref_count_number.configure(text=photo_count)
-                loading.update()
+        loading_update(counter, amount, photo_count)
         # За один фотон до конца высвечивается оповещение о завершении работы
         if (counter == (amount - 1)):
             tkinter.messagebox.showinfo(title="Готово!",

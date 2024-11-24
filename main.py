@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import ttk
-from drawing import drawing
+from calculation import drawing
 from idlelib.tooltip import Hovertip
 from tkinter.filedialog import askopenfile
 from matrix_rebuild import rebuild
@@ -93,7 +93,7 @@ is_show_load_tip = Hovertip(is_show_load_check, 'Окно прогресса с�
                                                 'однако существенно снижает производительность')
 
 
-# Функция, переносящая введённые параметры в файл drawing.py
+# Функция, переносящая введённые параметры в файл calculation.py
 def start():
     drawing(float(mu_s_take.get()), float(mu_a_take.get()), float(n_take.get()),
             float(n_out_take.get()), float(g_take.get()), int(amount_take.get()),

@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from numpy import log
 
 # Функция, выводящая окна с информацией об отражённых назад из среды фотонах
-# Информация берётся напрямую из drawing.py
+# Информация берётся напрямую из calculation.py
 def openmatrix(size, cylinder_size, max_depth, max_radius, fix_radius, matrix=[[]], cylinder=[[]]):
     # Инициализация списков-дублёров переданных списков
     matrix_data = []
