@@ -1,3 +1,4 @@
+import colorsys
 import tkinter.messagebox
 from tkinter import *
 from tkinter import ttk
@@ -6,10 +7,12 @@ from math import sqrt,  floor
 from photon import photon_calculation
 from get_result import open
 
+
 # Основная функция, использует значения переменных, переданных из главного меню (main.py)
 # Создаёт окно, на котором показываются траектории первых 100 пролетевших фотонов
 # Рассчитывает полёт всех фотонов, а так же заносит данные о глубине и весе в соответствующие списки
-def drawing(Ms, Ma, n, n_out, g, amount, is_show_load, max_deep_int, max_rad_int, fix_rad):
+def drawing(parameters: list[dict[str, float]], amount: int,
+            is_show_load: bool, max_deep_int: int, max_rad_int: int, fix_rad: float, layers: int):
     # Инициализация списков обратного отражения, MATRIX для занесения значений веса,
     # Cylinder для значений зависимости глубины пролёта фотона от расстояния до центра пучка
     MATRIX = []
@@ -69,16 +72,6 @@ def drawing(Ms, Ma, n, n_out, g, amount, is_show_load, max_deep_int, max_rad_int
     # Количество отражённых фотонов
     photo_count = 0
 
-    # Средняя длина свободного пробега
-    length_average = 1.0/(Ms + Ma)
-
-    # Текущий вес фотона
-    P = 1.0
-    # Изменение веса фотона в единичном рассеивателе
-    P_diff = (P * Ma)/(Ms + Ma)
-    # Минимальный вес фотона до поглощения
-    P_min = 0.00001 * P
-
     # Если разрешён показ загрузки, создаём окно загрузки
     if (is_show_load):
         # Cоздание окна прогресса выполнения программы
@@ -123,7 +116,7 @@ def drawing(Ms, Ma, n, n_out, g, amount, is_show_load, max_deep_int, max_rad_int
             count_number.configure(text=counter)
             ref_count_number.configure(text=photo_count)
             loading.update()
-            # По достижению загрузки за один фотон до конца, числа становятся конечными
+        # По достижению загрузки за один фотон до конца, числа становятся конечными
         if (counter == (amount - 1)):
             load_pr['value'] = amount
             percent_number.configure(text=100)
@@ -137,13 +130,28 @@ def drawing(Ms, Ma, n, n_out, g, amount, is_show_load, max_deep_int, max_rad_int
     c = Canvas(root, width=600, height=600, bg='white')
     c.pack()
 
+    strip_height = 600 // layers
+
+    for layer in range(layers):
+        hue = layer / layers
+        # Преобразование HSV в RGB
+        r, g, b = colorsys.hsv_to_rgb(hue, 0.2, 1.0)
+
+        # Конвертация в HEX
+        hex_color = "#{:02x}{:02x}{:02x}".format(
+            int(r * 255),
+            int(g * 255),
+            int(b * 255)
+        )
+        c.create_rectangle(0, layer * strip_height, 600, (layer + 1) * strip_height, fill=hex_color, outline='')
+
     # Создание рамки для кнопок
     dr_frame = Frame(root)
 
     # Cоздание кнопки, вызывающей функцию open
-    show_button = Button(dr_frame, text="Открыть матрицу отражения", command=open(
+    show_button = Button(dr_frame, text="Открыть матрицу отражения", command=lambda: open(
         MATRIX, Cylinder,
-        Ma, Ms, n, n_out, g,
+        parameters,
         amount, size, fix_rad, photo_count,
         max_radius, max_depth, max_cylinder
     ))
@@ -169,16 +177,14 @@ def drawing(Ms, Ma, n, n_out, g, amount, is_show_load, max_deep_int, max_rad_int
             x_start, y_start, z_start,
             Gx_start, Gy_start, Gz_start,
             max_x, max_y, max_z,
-            length_average,
-            P_diff, P_min,
-            g, n, n_out
+            parameters, layers
         )
 
         if (result == "get_back"):
-            photo_count = photo_count + 1
+            photo_count += 1
 
         # По окончанию обработки фотона, обновляем число прошедших обработку фотонов
-        counter = counter + 1
+        counter += 1
 
     # Зацикливание работы Tkinter, чтобы окно с данными не закрывалось без указания пользователя
     root.mainloop()

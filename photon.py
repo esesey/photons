@@ -3,17 +3,28 @@ from random import uniform
 from numpy import sign
 
 
-def photon_calculation(c, counter, get_matrix, log_at,
-                       x_start, y_start, z_start,
-                       Gx_start, Gy_start, Gz_start,
-                       max_x, max_y, max_z,
-                       length_average,
-                       P_diff, P_min,
-                       g, n, n_out):
+def photon_calculation(c, counter: int, get_matrix, log_at,
+                       x_start: float, y_start: float, z_start: float,
+                       Gx_start: float, Gy_start: float, Gz_start: float,
+                       max_x: float, max_y: float, max_z: float,
+                       parameters: list[dict[str, float]], layers: int):
+    Ms = parameters[0]["mu_s"]
+    Ma = parameters[0]["mu_a"]
+    n = parameters[0]["n"]
+    n_out = parameters[0]["n_out"]
+    g = parameters[0]["g"]
+
     # Зануление наибольшей глубины пролёта фотона
     deepest_z = 0.0
-    # Начальный вес фотона
+    # Средняя длина свободного пробега
+    length_average = 1.0 / (Ms + Ma)
+
+    # Текущий вес фотона
     P = 1.0
+    # Изменение веса фотона в единичном рассеивателе
+    P_diff = (P * Ma) / (Ms + Ma)
+    # Минимальный вес фотона до поглощения
+    P_min = 0.00001 * P
     # Случайное число от 0 до 1
     Epsilon = uniform(0, 1.0)
 
@@ -87,7 +98,7 @@ def photon_calculation(c, counter, get_matrix, log_at,
         P = P - P_diff
         # fix: при больших Ma фотон мог потерять веса больше, чем имеет
         if P < 0:
-            P = 0
+            break
 
         # Проверка вылета по y-координате
         if y_next < 0 or y_next > max_y:
