@@ -177,18 +177,30 @@ def photon_calculation(c, counter: int, get_matrix, log_at,
                         # Возвращаем информацию, что фотон отразился
                         return ("get_back")
                     else:
+                        # Пересчёт координат для преломления
+                        y_next = (y_next - y_previous) * (
+                                (minZ - z_previous) / (z_next - z_previous) + y_previous / (y_next - y_previous))
+                        x_next = (x_next - x_previous) * (
+                                (minZ - z_previous) / (z_next - z_previous) + x_previous / (x_next - x_previous))
+                        z_next = minZ
                         minZ = breakpoints[currentLayer - 2]
                         maxZ = breakpoints[currentLayer - 1]
                         currentLayer -= 1
-                        # Добавить пересчёт координат для преломления
                 else:
                     if z_next >= max_z:
                         break
                     else:
+                        # Пересчёт координат для преломления
+                        y_next = (y_next - y_previous) * (
+                                (maxZ - z_previous) / (z_next - z_previous) + y_previous / (y_next - y_previous))
+                        x_next = (x_next - x_previous) * (
+                                (maxZ - z_previous) / (z_next - z_previous) + x_previous / (x_next - x_previous))
+                        z_next = maxZ
                         minZ = breakpoints[currentLayer]
                         maxZ = breakpoints[currentLayer + 1]
                         currentLayer += 1
-                        # Добавить пересчёт координат для преломления
+                # Пересчёт направляющего косинуса после преломления
+                current_Gz = cos(asin(sin(Az) * n/n_out))
             else:
                 # Отражение произошло
                 # Пересчёт всех координат, в зависимости от того, с какой из сторон пришёл фотон
