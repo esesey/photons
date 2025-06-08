@@ -8,11 +8,27 @@ def photon_calculation(c, counter: int, get_matrix, log_at,
                        Gx_start: float, Gy_start: float, Gz_start: float,
                        max_x: float, max_y: float, max_z: float,
                        parameters: list[dict[str, float]], layers: int):
+    breakpoints = [0]
+    strip_length = max_z // layers
+    for layer in range(layers):
+        breakpoints.append(strip_length * (layer + 1))
+    breakpoints[len(breakpoints)-1] = max_z
+
+    n_out_up_list = [
+        parameters[0]["n_out"] if i == 0 else parameters[i - 1]["n"]
+        for i in range(len(parameters))
+    ]
+    n_out_down_list = [
+        parameters[i]["n_out"] if i == len(parameters) - 1 else parameters[i + 1]["n"]
+        for i in range(len(parameters))
+    ]
+
+    minZ = breakpoints[0]
+    maxZ = breakpoints[1]
+    currentLayer = 1
+
     Ms = parameters[0]["mu_s"]
     Ma = parameters[0]["mu_a"]
-    n = parameters[0]["n"]
-    n_out = parameters[0]["n_out"]
-    g = parameters[0]["g"]
 
     # Зануление наибольшей глубины пролёта фотона
     deepest_z = 0.0
@@ -21,8 +37,6 @@ def photon_calculation(c, counter: int, get_matrix, log_at,
 
     # Текущий вес фотона
     P = 1.0
-    # Изменение веса фотона в единичном рассеивателе
-    P_diff = (P * Ma) / (Ms + Ma)
     # Минимальный вес фотона до поглощения
     P_min = 0.00001 * P
     # Случайное число от 0 до 1
@@ -50,6 +64,16 @@ def photon_calculation(c, counter: int, get_matrix, log_at,
 
     # Цикл жизни одного фотона (1 итерация = 1 единичный рассеиватель)
     while P > P_min:
+        Ms = parameters[currentLayer - 1]["mu_s"]
+        Ma = parameters[currentLayer - 1]["mu_a"]
+        n = parameters[currentLayer - 1]["n"]
+        n_out_up = n_out_up_list[currentLayer - 1]
+        n_out_down = n_out_down_list[currentLayer - 1]
+        g = parameters[currentLayer - 1]["g"]
+        # Пересчёт длины среднего свободного пробега на случай, если поменялись параметры среды
+        length_average = 1.0 / (Ms + Ma)
+        # Изменение веса фотона в единичном рассеивателе
+        P_diff = (P * Ma) / (Ms + Ma)
         # Присвоение значения переменной Тета в зависимости от параметра анизотропии и случайного числа от 0 до 1
         Epsilon = uniform(0, 1.0)
         if g == 0:
@@ -109,13 +133,18 @@ def photon_calculation(c, counter: int, get_matrix, log_at,
             break
 
         # Проверка вылета или отражения по z-координате
-        if z_next < 0 or z_next > max_z:
+        if z_next < minZ or z_next > maxZ:
             # Вытаскиваем угол к нормали по z-координате из направляющего косинуса
             Az = acos(current_Gz)
 
             # Если угол больше 90 градусов, обрезаем его
             if Az > (pi / 2):
                 Az = Az - pi / 2
+
+            if z_next < minZ:
+                n_out = n_out_up
+            if z_next > maxZ:
+                n_out = n_out_down
 
             # Проверка на отражение по формулам Френеля
             if Az == 0:
@@ -136,34 +165,47 @@ def photon_calculation(c, counter: int, get_matrix, log_at,
                 )
             # Случайное число от 0 до 1
             Epsilon = uniform(0, 1.0)
-            # Число Френеля является вероятностью отражения, поэтому, чтобы определить
+            # Число Френеля является вероятностью отражения, поэтому, чтобы определить,
             # произошло ли отражение, сравниваем число Френеля со случайным числом
             if Frenel < Epsilon:
                 # Отражение не произошло, фотон вылетел, если он вылетел в обратную сторону,
                 # фиксируем его данные с помощью функций.
-                if z_next <= 0:
-                    get_matrix(x_next, y_next, P)
-                    log_at(x_next, y_next, P, deepest_z)
-                    # Возвращаем информацию, что фотон отразился
-                    return("get_back")
-                break
+                if z_next <= minZ:
+                    if z_next <= 0:
+                        get_matrix(x_next, y_next, P)
+                        log_at(x_next, y_next, P, deepest_z)
+                        # Возвращаем информацию, что фотон отразился
+                        return ("get_back")
+                    else:
+                        minZ = breakpoints[currentLayer - 2]
+                        maxZ = breakpoints[currentLayer - 1]
+                        currentLayer -= 1
+                        # Добавить пересчёт координат для преломления
+                else:
+                    if z_next >= max_z:
+                        break
+                    else:
+                        minZ = breakpoints[currentLayer]
+                        maxZ = breakpoints[currentLayer + 1]
+                        currentLayer += 1
+                        # Добавить пересчёт координат для преломления
             else:
                 # Отражение произошло
                 # Пересчёт всех координат, в зависимости от того, с какой из сторон пришёл фотон
-                if z_next < 0:
+                if z_next < minZ:
                     y_next = (y_next - y_previous) * (
-                            (- z_previous) / (z_next - z_previous) + y_previous / (y_next - y_previous))
+                            (minZ - z_previous) / (z_next - z_previous) + y_previous / (y_next - y_previous))
                     x_next = (x_next - x_previous) * (
-                            (- z_previous) / (z_next - z_previous) + x_previous / (x_next - x_previous))
-                    z_next = 0
+                            (minZ - z_previous) / (z_next - z_previous) + x_previous / (x_next - x_previous))
+                    z_next = minZ
                 else:
                     y_next = (y_next - y_previous) * (
-                            (max_z - z_previous) / (z_next - z_previous) + y_previous / (y_next - y_previous))
+                            (maxZ - z_previous) / (z_next - z_previous) + y_previous / (y_next - y_previous))
                     x_next = (x_next - x_previous) * (
-                            (max_z - z_previous) / (z_next - z_previous) + x_previous / (x_next - x_previous))
-                    z_next = max_z
+                            (maxZ - z_previous) / (z_next - z_previous) + x_previous / (x_next - x_previous))
+                    z_next = maxZ
 
-                # Отражаем старый угол (поскольку среда однослойная, мы можем сделать это так)
+                # Отражаем старый угол
                 current_Gz = - current_Gz
 
         # Если глубина прохода фотона больше, чем наибольшая, обновляем данные

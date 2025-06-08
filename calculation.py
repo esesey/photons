@@ -74,7 +74,7 @@ def drawing(parameters: list[dict[str, float]], amount: int,
 
     # Если разрешён показ загрузки, создаём окно загрузки
     if (is_show_load):
-        # Cоздание окна прогресса выполнения программы
+        # Создание окна прогресса выполнения программы
         loading = Tk()
         loading.title('Загрузка')
         loading.geometry("250x100")
@@ -132,10 +132,11 @@ def drawing(parameters: list[dict[str, float]], amount: int,
 
     strip_height = 600 // layers
 
+    # Красим в разные цвета каждый слой среды
     for layer in range(layers):
         hue = layer / layers
         # Преобразование HSV в RGB
-        r, g, b = colorsys.hsv_to_rgb(hue, 0.2, 1.0)
+        r, g, b = colorsys.hsv_to_rgb(hue, 0.15, 1.0)
 
         # Конвертация в HEX
         hex_color = "#{:02x}{:02x}{:02x}".format(
@@ -148,7 +149,7 @@ def drawing(parameters: list[dict[str, float]], amount: int,
     # Создание рамки для кнопок
     dr_frame = Frame(root)
 
-    # Cоздание кнопки, вызывающей функцию open
+    # Создание кнопки, вызывающей функцию open
     show_button = Button(dr_frame, text="Открыть матрицу отражения", command=lambda: open(
         MATRIX, Cylinder,
         parameters,
@@ -156,7 +157,7 @@ def drawing(parameters: list[dict[str, float]], amount: int,
         max_radius, max_depth, max_cylinder
     ))
     show_button.grid(row=0, column=1, padx=3, pady=3)
-    # Cоздание кнопки, закрывающей текущее окно с траекториями
+    # Создание кнопки, закрывающей текущее окно с траекториями
     quit_pic_button = Button(dr_frame, text="Закрыть картинку", command=root.destroy)
     quit_pic_button.grid(row=0, column=2, padx=3, pady=3)
 
