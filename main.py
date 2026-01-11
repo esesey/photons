@@ -5,6 +5,8 @@ from idlelib.tooltip import Hovertip
 from tkinter.filedialog import askopenfile
 from matrix_rebuild import rebuild
 
+from typing import Optional, Union, Dict
+
 # Создание стартового окна и рамки для кнопок
 window = Tk()
 window.title("Панель управления")
@@ -17,7 +19,7 @@ widgets = []
 layers = 0
 
 # Создание панели ввода параметра количества выпускаемых фотонов
-amount = IntVar(value=100000)
+amount = IntVar(value=100)
 amount_label = Label(buttonFrame, text="Кол-во выпускаемых фотонов")
 amount_label.grid(row=3, column=1)
 amount_take = Entry(buttonFrame, textvariable=amount, width=10)
@@ -103,12 +105,20 @@ def deleteLayer(index):
             layers -= 1
             break
 
-def addLayer():
+
+def addLayer(initial: Optional[Dict[str, float]] = None):
     global layers, widgets
+    values = initial or {
+        "Ms": 7.0,
+        "Ma": 0.002,
+        "n": 1.37,
+        "n_out": 1.0,
+        "g": 0.9,
+    }
 
     index = layers + 1
     # Создание панели ввода параметра коэффициента рассеяния среды
-    Ms = DoubleVar(value=10.0)
+    Ms = DoubleVar(value=values["Ms"])
     mu_s_label = Label(buttonFrame, text="μs (Коэфф. рассеяния)")
     mu_s_label.grid(row=5, padx=3, column=index)
     mu_s_take = Entry(buttonFrame, textvariable=Ms, width=10)
@@ -116,7 +126,7 @@ def addLayer():
     mu_s_tip = Hovertip(mu_s_take, "от ~0 до 20")
 
     # Создание панели ввода параметра коэффициента поглощения среды
-    Ma = DoubleVar(value=0.002)
+    Ma = DoubleVar(value=values["Ma"])
     mu_a_label = Label(buttonFrame, text="μa (Коэфф. поглощения)")
     mu_a_label.grid(row=7, padx=3, column=index)
     mu_a_take = Entry(buttonFrame, textvariable=Ma, width=10)
@@ -124,7 +134,7 @@ def addLayer():
     mu_a_tip = Hovertip(mu_a_take, "от ~0 до 0.5")
 
     # Создание панели ввода параметра коэффициента преломления среды
-    n = DoubleVar(value=1.37)
+    n = DoubleVar(value=values["n"])
     n_label = Label(buttonFrame, text="n (Коэфф. преломления среды)")
     n_label.grid(row=9, padx=3, column=index)
     n_take = Entry(buttonFrame, textvariable=n, width=10)
@@ -132,7 +142,7 @@ def addLayer():
     n_tip = Hovertip(n_take, "от 1 до 2")
 
     # Создание панели ввода параметра коэффициента преломления окружающей среды
-    n_out = DoubleVar(value=1.0)
+    n_out = DoubleVar(value=values["n_out"])
     n_out_label = Label(buttonFrame, text="n_out (Коэфф. преломления окр. среды)")
     n_out_label.grid(row=11, padx=3, column=index)
     n_out_take = Entry(buttonFrame, textvariable=n_out, width=10)
@@ -140,7 +150,7 @@ def addLayer():
     n_out_tip = Hovertip(n_out_take, "от 1 до 2")
 
     # Создание панели ввода параметра коэффициента анизотропии
-    g = DoubleVar(value=0.9)
+    g = DoubleVar(value=values["g"])
     g_label = Label(buttonFrame, text="g (Коэфф. анизотропии)")
     g_label.grid(row=13, padx=3, column=index)
     g_take = Entry(buttonFrame, textvariable=g, width=10)
@@ -212,7 +222,20 @@ button3.grid(row=33, column=1, padx=10, pady=10)
 button5 = Button(buttonFrame, text="Выйти из программы", command=window.destroy)
 button5.grid(row=34, column=1)
 
-addLayer()
+addLayer({
+        "Ms": 0.5,
+        "Ma": 0.0001,
+        "n": 1.37,
+        "n_out": 1.0,
+        "g": 0.7,
+    })
+addLayer({
+        "Ms": 8.0,
+        "Ma": 0.002,
+        "n": 1.8,
+        "n_out": 1.0,
+        "g": 0.9,
+    })
 
 # Компиляция рамки для кнопок и её прилипание к верхней границе
 buttonFrame.pack(anchor="n")

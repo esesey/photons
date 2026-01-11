@@ -137,9 +137,9 @@ def photon_calculation(c, counter: int, get_matrix, log_at,
             # Вытаскиваем угол к нормали по z-координате из направляющего косинуса
             Az = acos(current_Gz)
 
-            # Если угол больше 90 градусов, обрезаем его
+            # Если угол больше 90 градусов, берём угол меньшего размера
             if Az > (pi / 2):
-                Az = Az - pi / 2
+                Az = pi - Az
 
             if z_next < minZ:
                 n_out = n_out_up
@@ -170,11 +170,16 @@ def photon_calculation(c, counter: int, get_matrix, log_at,
             if Frenel < Epsilon:
                 # Отражение не произошло, фотон вылетел, если он вылетел в обратную сторону,
                 # фиксируем его данные с помощью функций.
+                # print(f"Ф{f'0{counter}' if counter < 10 else counter}", "OUT   ", f"z0={round(z_previous, 1):<6.1f}",
+                #       f"y0={round(y_previous, 1):<6.1f}",
+                #       f"x0={round(x_previous, 1):<6.1f}", f"z1={round(z_next, 1):<6.1f}",
+                #       f"y1={round(y_next, 1):<6.1f}", f"x1={round(x_next, 1):<6.1f}", f"Gz={round(current_Gz, 3):<6.3f}",
+                #       f"acos(Gz)={round(acos(current_Gz) * 57.3, 1):<5.1f}°")
                 if z_next <= minZ:
                     if z_next <= 0:
                         get_matrix(x_next, y_next, P)
                         log_at(x_next, y_next, P, deepest_z)
-                        # Возвращаем информацию, что фотон отразился
+                        # Возвращаем информацию, что фотон вылетел назад
                         return ("get_back")
                     else:
                         # Пересчёт координат для преломления
@@ -199,11 +204,24 @@ def photon_calculation(c, counter: int, get_matrix, log_at,
                         minZ = breakpoints[currentLayer]
                         maxZ = breakpoints[currentLayer + 1]
                         currentLayer += 1
+                direction = -1 if current_Gz < 0 else 1
+                # print(f"Ф{f'0{counter}' if counter < 10 else counter}", "REFR  ", f"z0={round(z_previous, 1):<6.1f}",
+                #       f"y0={round(y_previous, 1):<6.1f}",
+                #       f"x0={round(x_previous, 1):<6.1f}", f"z1={round(z_next, 1):<6.1f}",
+                #       f"y1={round(y_next, 1):<6.1f}", f"x1={round(x_next, 1):<6.1f}", f"Gz={round(current_Gz, 3):<6.3f}",
+                #       f"acos(Gz)={round(acos(current_Gz) * 57.3, 1):<5.1f}°",
+                #       f"Gz1={round(cos(asin(sin(Az) * n / n_out)) * direction, 3):<6.3f}",
+                #       f"acos(Gz1)={round(asin(sin(Az) * n / n_out) * 57.3, 1):<5.1f}°")
                 # Пересчёт направляющего косинуса после преломления
-                current_Gz = cos(asin(sin(Az) * n/n_out))
+                current_Gz = cos(asin(sin(Az) * n/n_out)) * direction
+
             else:
                 # Отражение произошло
                 # Пересчёт всех координат, в зависимости от того, с какой из сторон пришёл фотон
+                # print(f"Ф{f'0{counter}' if counter < 10 else counter}", "REFL_S                              ",
+                #       f"z1={round(z_next, 1):<6.1f}", f"y1={round(y_next, 1):<6.1f}",
+                #       f"x1={round(x_next, 1):<6.1f}", f"Gz={round(current_Gz, 3):<6.3f}",
+                #       f"acos(Gz)={round(acos(current_Gz) * 57.3, 1):<5.1f}°")
                 if z_next < minZ:
                     y_next = (y_next - y_previous) * (
                             (minZ - z_previous) / (z_next - z_previous) + y_previous / (y_next - y_previous))
@@ -219,6 +237,10 @@ def photon_calculation(c, counter: int, get_matrix, log_at,
 
                 # Отражаем старый угол
                 current_Gz = - current_Gz
+                # print(f"Ф{f'0{counter}' if counter < 10 else counter}", "REFL_E                              ",
+                #       f"z1={round(z_next, 1):<6.1f}", f"y1={round(y_next, 1):<6.1f}",
+                #       f"x1={round(x_next, 1):<6.1f}", f"Gz={round(current_Gz, 3):<6.3f}",
+                #       f"acos(Gz)={round(acos(current_Gz) * 57.3, 1):<5.1f}°")
 
         # Если глубина прохода фотона больше, чем наибольшая, обновляем данные
         if z_next > deepest_z:

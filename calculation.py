@@ -186,6 +186,6 @@ def drawing(parameters: list[dict[str, float]], amount: int,
 
         # По окончанию обработки фотона, обновляем число прошедших обработку фотонов
         counter += 1
-
+    print("\n\nEND\n\n")
     # Зацикливание работы Tkinter, чтобы окно с данными не закрывалось без указания пользователя
     root.mainloop()
