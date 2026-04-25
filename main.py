@@ -27,6 +27,9 @@ amount_take = Entry(buttonFrame, textvariable=amount, width=10)
 amount_take.grid(row=4, column=1, padx=3, pady=3)
 amount_tip = Hovertip(amount_take, "от 1 до 100m")
 
+# TODO: Убрать возможность ставить ограничения больше, чем возможно, исходя из толщины сред.
+#  Также синхронизировать значения, показываемые на графиках, с реальными значениями
+
 # Создание панели ввода параметра максимальной глубины
 max_d = DoubleVar(value=20)
 max_d_label = Label(buttonFrame, text="Максимальная глубина")
