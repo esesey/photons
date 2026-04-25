@@ -6,6 +6,7 @@ from math import sqrt,  floor
 
 from photon import photon_calculation
 from get_result import open
+from relative_thickness import create_color_layer_presentation
 
 
 # Основная функция, использует значения переменных, переданных из главного меню (main.py)
@@ -130,28 +131,7 @@ def drawing(parameters: list[dict[str, float]], amount: int,
     c = Canvas(root, width=600, height=600, bg='white')
     c.pack()
 
-    total_thickness = sum(layer["thickness"] for layer in parameters)
-    # Переменная для накопления толщины предыдущих слоёв
-    cumulative_thickness = 0
-
-    # Красим в разные цвета каждый слой среды
-    for index, layer in enumerate(parameters):
-        layer_thickness = (layer["thickness"] / total_thickness) * 600
-        previous_layers_thickness = (cumulative_thickness / total_thickness) * 600
-        cumulative_thickness += layer["thickness"]
-
-        hue = (index + 1) / len(parameters)
-        # Преобразование HSV в RGB
-        r, g, b = colorsys.hsv_to_rgb(hue, 0.15, 1.0)
-
-        # Конвертация в HEX
-        hex_color = "#{:02x}{:02x}{:02x}".format(
-            int(r * 255),
-            int(g * 255),
-            int(b * 255)
-        )
-
-        c.create_rectangle(0, previous_layers_thickness, 600, (index + 1) * layer_thickness, fill=hex_color, outline='')
+    create_color_layer_presentation(parameters, c, 600, 600)
 
     # Создание рамки для кнопок
     dr_frame = Frame(root)

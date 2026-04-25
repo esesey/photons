@@ -2,21 +2,16 @@ from math import cos, sin, pi, log, sqrt, acos, asin, tan
 from random import uniform
 from numpy import sign
 
+from relative_thickness import get_breakpoints
+
 
 def photon_calculation(c, counter: int, get_matrix, log_at,
                        x_start: float, y_start: float, z_start: float,
                        Gx_start: float, Gy_start: float, Gz_start: float,
                        max_x: float, max_y: float, max_z: float,
                        parameters: list[dict[str, float]]):
-    breakpoints = [0]
-    total_thickness = sum(layer["thickness"] for layer in parameters)
-    cumulative_thickness = 0
-    for layer in parameters:
-        layer_thickness = (layer["thickness"] / total_thickness) * max_z
-        previous_layers_thickness = (cumulative_thickness / total_thickness) * max_z
-        cumulative_thickness += layer["thickness"]
-        breakpoints.append(layer_thickness + previous_layers_thickness)
-    breakpoints[len(breakpoints)-1] = max_z
+
+    breakpoints = get_breakpoints(parameters, max_z)
 
     n_out_up_list = [
         parameters[0]["n_out"] if i == 0 else parameters[i - 1]["n"]
