@@ -7,6 +7,7 @@ def get_field_values_string(data: list[dict[str, float]], field: str) -> str:
     values_str = ", ".join(str(v) for v in values)
     return f"({values_str})"
 
+
 # Функция, выводящая статистику в консоль, сохраняющая файлы с матрицами
 # и открывающая карты значений (matrix.py)
 def open(

@@ -1,4 +1,3 @@
-import colorsys
 import tkinter.messagebox
 from tkinter import *
 from tkinter import ttk
@@ -11,14 +10,14 @@ from relative_thickness import create_color_layer_presentation
 
 # Основная функция, использует значения переменных, переданных из главного меню (main.py)
 # Создаёт окно, на котором показываются траектории первых 100 пролетевших фотонов
-# Рассчитывает полёт всех фотонов, а так же заносит данные о глубине и весе в соответствующие списки
+# Расчитывает полёт всех фотонов, а так же заносит данные о глубине и весе в соответствующие списки
 def drawing(parameters: list[dict[str, float]], amount: int,
             is_show_load: bool, max_deep_int: int, max_rad_int: int, fix_rad: float):
     # Инициализация списков обратного отражения, MATRIX для занесения значений веса,
     # Cylinder для значений зависимости глубины пролёта фотона от расстояния до центра пучка
     MATRIX = []
     Cylinder = []
-    # Рассчёт длины радиуса циллиндра в зависимости от размера матрицы отражения
+    # Расчёт длины радиуса цилиндра в зависимости от размера матрицы отражения
     # max_cylinder = floor(size/2)
     size = 200
     max_cylinder = 100
@@ -40,7 +39,7 @@ def drawing(parameters: list[dict[str, float]], amount: int,
     max_y = 200.0
     max_z = 200.0
 
-    # Значения высоты и радиуса циллиндра, переданные параметрами
+    # Значения высоты и радиуса цилиндра, переданные параметрами
     max_depth = float(max_deep_int)
     max_radius = float(max_rad_int)
 
@@ -57,7 +56,7 @@ def drawing(parameters: list[dict[str, float]], amount: int,
     def get_matrix(x_next, y_next, P):
         index_1: int = int(size/2) + floor((x_next - x_start) * size / (2 * max_radius))
         index_2: int = int(size/2) + floor((y_next - y_start) * size / (2 * max_radius))
-        if (index_1 < size and index_2 < size and index_1 > 0 and index_2 > 0):
+        if size > index_1 > 0 and size > index_2 > 0:
             MATRIX[index_1][index_2] += P
 
     # Функция, заполняющая список Cylinder
@@ -65,7 +64,7 @@ def drawing(parameters: list[dict[str, float]], amount: int,
         index_1: int = floor(max_cylinder * (deepest_z / max_depth))
         index_2: int = floor(max_cylinder * (sqrt(abs(x - x_start) * abs(x - x_start) +
                                                   abs(y - y_start) * abs(y - y_start)) / max_radius))
-        if (index_1 < max_cylinder and index_2 < max_cylinder):
+        if index_1 < max_cylinder and index_2 < max_cylinder:
             Cylinder[index_1][index_2] += P
 
     # Количество прошедших фотонов
@@ -173,6 +172,5 @@ def drawing(parameters: list[dict[str, float]], amount: int,
 
         # По окончанию обработки фотона, обновляем число прошедших обработку фотонов
         counter += 1
-    print("\n\nEND\n\n")
     # Зацикливание работы Tkinter, чтобы окно с данными не закрывалось без указания пользователя
     root.mainloop()

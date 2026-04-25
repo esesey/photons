@@ -1,11 +1,12 @@
 from tkinter import *
 from tkinter import ttk
-from calculation import drawing
 from idlelib.tooltip import Hovertip
 from tkinter.filedialog import askopenfile
+
+from calculation import drawing
 from matrix_rebuild import rebuild
 
-from typing import Optional, Union, Dict
+from typing import Optional, Dict
 
 # Создание стартового окна и рамки для кнопок
 window = Tk()
@@ -77,6 +78,7 @@ def start():
 
     drawing(parameters, int(amount_take.get()), bool(is_show_load.get()),
             int(max_d.get()), int(max_r_take.get()), float(fix_r_take.get()))
+
 
 def takeFromFile():
     file = askopenfile(parent=buttonFrame, filetypes=[('Text Files', '*.txt')])

@@ -3,6 +3,7 @@ from numpy import log
 
 # Данный модуль используется для построения только одной матрицы по txt файлу
 
+
 def rebuild(name, data, fix_radius):
     size = 200
     cylinder_size = 100

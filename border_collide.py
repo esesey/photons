@@ -2,6 +2,10 @@ from math import cos, sin, pi, acos, asin, tan
 from random import uniform
 
 
+# Этот модуль посвящён расчётам при столкновении фотона с границей среды/слоя
+
+
+# Расчёт числа Френеля
 def calculate_Frenel(angle: float, n: float, n_out: float):
     if angle == 0:
         Frenel = ((n_out - n) / (n_out + n)) ** 2
@@ -22,6 +26,7 @@ def calculate_Frenel(angle: float, n: float, n_out: float):
     return Frenel
 
 
+# Расчёт данных при отражении по оси z
 def calculate_reflection_z(x_previous, y_previous, z_previous, x_next, y_next, z_next, minZ, maxZ, current_Gz):
     # Пересчёт всех координат, в зависимости от того, с какой из сторон пришёл фотон
     # print(f"Ф{f'0{counter}' if counter < 10 else counter}", "REFL_S                              ",
@@ -50,6 +55,7 @@ def calculate_reflection_z(x_previous, y_previous, z_previous, x_next, y_next, z
     return [current_Gz, x, y, z]
 
 
+# Расчёт данных при преломлении по оси z
 def calculate_refraction_z(x_previous, y_previous, z_previous, x_next, y_next, z_next, minZ, maxZ, current_Gz, n, n_out, angle, breakpoints, currentLayer):
     # Пересчёт координат для преломления
     if z_next <= minZ:
@@ -83,6 +89,7 @@ def calculate_refraction_z(x_previous, y_previous, z_previous, x_next, y_next, z
     return [current_Gz, x, y, z, minZ, maxZ, currentLayer]
 
 
+# Расчёт данных при столкновении с границей по оси z
 def collide_handler_z(x_previous, y_previous, z_previous, x_next, y_next, z_next, minZ, maxZ, current_Gz, n,
                       n_out_up, n_out_down, get_matrix, log_at, P, deepest_z, breakpoints, currentLayer, max_z):
     # Вытаскиваем угол к нормали по z-координате из направляющего косинуса

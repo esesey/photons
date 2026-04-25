@@ -1,9 +1,14 @@
 import colorsys
 from tkinter import Canvas
 
+
+# Этот модуль посвящён расчётам, связанным с толщиной слоёв
+
+
 # Рассчитывает относительную толщину слоя (в у.е. вместо мм)
 def relative_thickness(thickness: float, total_thickness: float, maximum: float):
     return (thickness / total_thickness) * maximum
+
 
 # Создаёт цветные прямоугольники для визуального представления слоёв
 def create_color_layer_presentation(parameters: list[dict[str, float]], c: Canvas, canvas_height: float, canvas_width: float):
@@ -30,6 +35,7 @@ def create_color_layer_presentation(parameters: list[dict[str, float]], c: Canva
         )
 
         c.create_rectangle(0, previous_layers_thickness, canvas_width, (index + 1) * layer_thickness, fill=hex_color, outline='')
+
 
 # Возвращает массив с координатами границ слоёв
 def get_breakpoints(parameters: list[dict[str, float]], max_depth: float):

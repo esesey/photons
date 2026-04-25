@@ -6,6 +6,9 @@ from border_collide import collide_handler_z
 from relative_thickness import get_breakpoints
 
 
+# Этот модуль посвящён жизненному циклу одного фотона
+
+
 def photon_calculation(c, counter: int, get_matrix, log_at,
                        x_start: float, y_start: float, z_start: float,
                        Gx_start: float, Gy_start: float, Gz_start: float,
