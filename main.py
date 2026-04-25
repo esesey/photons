@@ -72,10 +72,11 @@ def start():
                 "n": float(widget["n"]["n_take"].get()),
                 "n_out": float(widget["n_out"]["n_out_take"].get()),
                 "g": float(widget["g"]["g_take"].get()),
+                "thickness": float(widget["thickness"]["th_take"].get()),
             })
 
     drawing(parameters, int(amount_take.get()), bool(is_show_load.get()),
-            int(max_d.get()), int(max_r_take.get()), float(fix_r_take.get()), layers)
+            int(max_d.get()), int(max_r_take.get()), float(fix_r_take.get()))
 
 def takeFromFile():
     file = askopenfile(parent=buttonFrame, filetypes=[('Text Files', '*.txt')])
@@ -100,6 +101,8 @@ def deleteLayer(index):
             widget_info["n_out"]["n_out_take"].destroy()
             widget_info["g"]["g_label"].destroy()
             widget_info["g"]["g_take"].destroy()
+            widget_info["thickness"]["th_label"].destroy()
+            widget_info["thickness"]["th_take"].destroy()
             widget_info["buttons"]["button_del"].destroy()
             widget_info["buttons"]["button_add"].destroy()
             layers -= 1
@@ -114,6 +117,7 @@ def addLayer(initial: Optional[Dict[str, float]] = None):
         "n": 1.37,
         "n_out": 1.0,
         "g": 0.9,
+        "thickness": 0.1,
     }
 
     index = layers + 1
@@ -157,13 +161,21 @@ def addLayer(initial: Optional[Dict[str, float]] = None):
     g_take.grid(row=14, column=index, padx=3, pady=3)
     g_tip = Hovertip(g_take, "от ~0 до 1")
 
+    # Создание панели ввода толщины слоя
+    thickness = DoubleVar(value=values["thickness"])
+    th_label = Label(buttonFrame, text="Толщина (в мм)")
+    th_label.grid(row=15, padx=3, column=index)
+    th_take = Entry(buttonFrame, textvariable=thickness, width=10)
+    th_take.grid(row=16, column=index, padx=3, pady=3)
+    th_tip = Hovertip(th_take, "от ~0 до 10")
+
     # Создание кнопки, добавляющей ещё один слой
     button_add = Button(buttonFrame, text="➕ Добавить слой среды", command=addLayer)
-    button_add.grid(row=15, column=index, padx=10, pady=10)
+    button_add.grid(row=17, column=index, padx=10, pady=10)
 
-    # Создание кнопки, с пеомощью которой можно будет удалить слой
+    # Создание кнопки, с помощью которой можно будет удалить слой
     button_del = Button(buttonFrame, text="❌ Удалить слой среды", command=lambda: deleteLayer(index))
-    button_del.grid(row=16, column=index, padx=10, pady=10)
+    button_del.grid(row=18, column=index, padx=10, pady=10)
 
     layer_info = {
         "mu_s": {
@@ -191,6 +203,11 @@ def addLayer(initial: Optional[Dict[str, float]] = None):
             "g_take": g_take,
             "g_tip": g_tip
         },
+        "thickness": {
+            "th_label": th_label,
+            "th_take": th_take,
+            "th_tip": th_tip
+        },
         "buttons": {
             "button_del": button_del,
             "button_add": button_add
@@ -203,6 +220,7 @@ def addLayer(initial: Optional[Dict[str, float]] = None):
 
     layers = index
 
+
 # Создание приветственной надписи
 info = Label(buttonFrame, font='Bold', text="Добро пожаловать! Выберите настройки:")
 info.grid(row=0, column=1, pady=10)
@@ -212,7 +230,7 @@ map_label.grid(row=26, column=1, pady=10)
 
 # Создание кнопки, активирующей функцию start
 button2 = Button(buttonFrame, text="Нарисовать траектории", command=start)
-button2.grid(row=17, column=1, padx=10, pady=10)
+button2.grid(row=19, column=1, padx=10, pady=10)
 
 # Создание кнопки, вызывающая функцию takeFromFile
 button3 = Button(buttonFrame, text="Построить карту из файла", command=takeFromFile)
@@ -223,18 +241,20 @@ button5 = Button(buttonFrame, text="Выйти из программы", command
 button5.grid(row=34, column=1)
 
 addLayer({
-        "Ms": 0.5,
-        "Ma": 0.0001,
+        "Ms": 33.23,
+        "Ma": 0.199,
         "n": 1.37,
         "n_out": 1.0,
-        "g": 0.7,
+        "g": 0.9,
+        "thickness": 0.1,
     })
 addLayer({
-        "Ms": 8.0,
-        "Ma": 0.002,
-        "n": 1.8,
+        "Ms": 15.44,
+        "Ma": 0.058,
+        "n": 1.37,
         "n_out": 1.0,
         "g": 0.9,
+        "thickness": 10,
     })
 
 # Компиляция рамки для кнопок и её прилипание к верхней границе

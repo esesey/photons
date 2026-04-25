@@ -12,7 +12,7 @@ from get_result import open
 # Создаёт окно, на котором показываются траектории первых 100 пролетевших фотонов
 # Рассчитывает полёт всех фотонов, а так же заносит данные о глубине и весе в соответствующие списки
 def drawing(parameters: list[dict[str, float]], amount: int,
-            is_show_load: bool, max_deep_int: int, max_rad_int: int, fix_rad: float, layers: int):
+            is_show_load: bool, max_deep_int: int, max_rad_int: int, fix_rad: float):
     # Инициализация списков обратного отражения, MATRIX для занесения значений веса,
     # Cylinder для значений зависимости глубины пролёта фотона от расстояния до центра пучка
     MATRIX = []
@@ -130,11 +130,17 @@ def drawing(parameters: list[dict[str, float]], amount: int,
     c = Canvas(root, width=600, height=600, bg='white')
     c.pack()
 
-    strip_height = 600 // layers
+    total_thickness = sum(layer["thickness"] for layer in parameters)
+    # Переменная для накопления толщины предыдущих слоёв
+    cumulative_thickness = 0
 
     # Красим в разные цвета каждый слой среды
-    for layer in range(layers):
-        hue = layer / layers
+    for index, layer in enumerate(parameters):
+        layer_thickness = (layer["thickness"] / total_thickness) * 600
+        previous_layers_thickness = (cumulative_thickness / total_thickness) * 600
+        cumulative_thickness += layer["thickness"]
+
+        hue = (index + 1) / len(parameters)
         # Преобразование HSV в RGB
         r, g, b = colorsys.hsv_to_rgb(hue, 0.15, 1.0)
 
@@ -144,7 +150,8 @@ def drawing(parameters: list[dict[str, float]], amount: int,
             int(g * 255),
             int(b * 255)
         )
-        c.create_rectangle(0, layer * strip_height, 600, (layer + 1) * strip_height, fill=hex_color, outline='')
+
+        c.create_rectangle(0, previous_layers_thickness, 600, (index + 1) * layer_thickness, fill=hex_color, outline='')
 
     # Создание рамки для кнопок
     dr_frame = Frame(root)
@@ -178,7 +185,7 @@ def drawing(parameters: list[dict[str, float]], amount: int,
             x_start, y_start, z_start,
             Gx_start, Gy_start, Gz_start,
             max_x, max_y, max_z,
-            parameters, layers
+            parameters
         )
 
         if (result == "get_back"):

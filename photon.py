@@ -7,11 +7,15 @@ def photon_calculation(c, counter: int, get_matrix, log_at,
                        x_start: float, y_start: float, z_start: float,
                        Gx_start: float, Gy_start: float, Gz_start: float,
                        max_x: float, max_y: float, max_z: float,
-                       parameters: list[dict[str, float]], layers: int):
+                       parameters: list[dict[str, float]]):
     breakpoints = [0]
-    strip_length = max_z // layers
-    for layer in range(layers):
-        breakpoints.append(strip_length * (layer + 1))
+    total_thickness = sum(layer["thickness"] for layer in parameters)
+    cumulative_thickness = 0
+    for layer in parameters:
+        layer_thickness = (layer["thickness"] / total_thickness) * max_z
+        previous_layers_thickness = (cumulative_thickness / total_thickness) * max_z
+        cumulative_thickness += layer["thickness"]
+        breakpoints.append(layer_thickness + previous_layers_thickness)
     breakpoints[len(breakpoints)-1] = max_z
 
     n_out_up_list = [
