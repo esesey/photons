@@ -20,7 +20,7 @@ widgets = []
 layers = 0
 
 # Создание панели ввода параметра количества выпускаемых фотонов
-amount = IntVar(value=100)
+amount = IntVar(value=1000000)
 amount_label = Label(buttonFrame, text="Кол-во выпускаемых фотонов")
 amount_label.grid(row=3, column=1)
 amount_take = Entry(buttonFrame, textvariable=amount, width=10)
@@ -256,7 +256,7 @@ addLayer({
 addLayer({
         "Ms": 15.44,
         "Ma": 0.058,
-        "n": 1.37,
+        "n": 1.4,
         "n_out": 1.0,
         "g": 0.9,
         "thickness": 10,

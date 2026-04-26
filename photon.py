@@ -38,6 +38,10 @@ def photon_calculation(c, counter: int, get_matrix, log_at,
     # Средняя длина свободного пробега
     length_average = 1.0 / (Ms + Ma)
 
+    total_thickness = sum(layer["thickness"] for layer in parameters)
+    # Коэффициент для перевода величин в миллиметрах в величины в координатах
+    length_koef = max_z/total_thickness
+
     # Текущий вес фотона
     P = 1.0
     # Минимальный вес фотона до поглощения
@@ -113,9 +117,9 @@ def photon_calculation(c, counter: int, get_matrix, log_at,
         x_previous = x_next
         y_previous = y_next
         z_previous = z_next
-        x_next = x_previous + length * current_Gx
-        y_next = y_previous + length * current_Gy
-        z_next = z_previous + length * current_Gz
+        x_next = x_previous + length * current_Gx * length_koef
+        y_next = y_previous + length * current_Gy * length_koef
+        z_next = z_previous + length * current_Gz * length_koef
 
         # Отрисовка траектории на этом шаге, если это один из первых 100 фотонов
         if counter < 100:
