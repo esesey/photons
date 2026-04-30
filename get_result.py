@@ -16,6 +16,10 @@ def open(
         amount, size, fix_rad, photo_count,
         max_radius, max_depth, max_cylinder
 ):
+    # Расчёт толщины среды
+    total_thickness = sum(layer["thickness"] for layer in parameters)
+    plot_size = min(total_thickness, max_depth)
+    rad_size = min(total_thickness/2, max_radius)
 
     amountStr = 'amount = ' + str(amount)
     parametersStr = ', Ms = ' + get_field_values_string(parameters, "mu_s") +\
@@ -23,9 +27,10 @@ def open(
                     ', n = ' + get_field_values_string(parameters, "n") +\
                     ', n_out = ' + get_field_values_string(parameters, "n_out") +\
                     ', g = ' + get_field_values_string(parameters, "g")
-    fixParametersStr = ', rad = ' + str(max_radius) + ', dep = ' + str(max_depth)
+    fixParametersStr = ', rad = ' + str(rad_size) + ', dep = ' + str(plot_size)
 
     numpy.savetxt('archive/matrix_ref ' + '[' + amountStr + parametersStr + fixParametersStr + ']' + '.txt', MATRIX)
     numpy.savetxt('archive/matrix_dis ' + '[' + amountStr + parametersStr + fixParametersStr + ']' + '.txt', Cylinder)
     print("Всего фотонов выпущено:", amount, " Фотонов отражено:", photo_count)
-    openmatrix(size, max_cylinder, max_depth, max_radius, fix_rad, MATRIX, Cylinder)
+    openmatrix(size, max_cylinder, plot_size, rad_size, fix_rad, MATRIX, Cylinder)
+

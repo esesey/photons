@@ -12,7 +12,7 @@ from relative_thickness import create_color_layer_presentation
 # Создаёт окно, на котором показываются траектории первых 100 пролетевших фотонов
 # Расчитывает полёт всех фотонов, а так же заносит данные о глубине и весе в соответствующие списки
 def drawing(parameters: list[dict[str, float]], amount: int,
-            is_show_load: bool, max_deep_int: int, max_rad_int: int, fix_rad: float):
+            is_show_load: bool, max_depth: float, max_radius: float, fix_rad: float):
     # Инициализация списков обратного отражения, MATRIX для занесения значений веса,
     # Cylinder для значений зависимости глубины пролёта фотона от расстояния до центра пучка
     MATRIX = []
@@ -21,6 +21,9 @@ def drawing(parameters: list[dict[str, float]], amount: int,
     # max_cylinder = floor(size/2)
     size = 200
     max_cylinder = 100
+
+    # Расчёт толщины среды
+    total_thickness = sum(layer["thickness"] for layer in parameters)
 
     # Задание размера списков и заполнение пустыми значениями
     for i in range(size):
@@ -39,10 +42,6 @@ def drawing(parameters: list[dict[str, float]], amount: int,
     max_y = 200.0
     max_z = 200.0
 
-    # Значения высоты и радиуса цилиндра, переданные параметрами
-    max_depth = float(max_deep_int)
-    max_radius = float(max_rad_int)
-
     # Начальные x, y и z
     x_start = 100.0
     y_start = 100.0
@@ -54,16 +53,16 @@ def drawing(parameters: list[dict[str, float]], amount: int,
 
     # Функция, заносящая вес отражённых фотонов в список MATRIX
     def get_matrix(x_next, y_next, P):
-        index_1: int = int(size/2) + floor((x_next - x_start) * size / (2 * max_radius))
-        index_2: int = int(size/2) + floor((y_next - y_start) * size / (2 * max_radius))
+        index_1: int = int(size/2) + floor((x_next - x_start) * size / min(total_thickness, (2 * max_radius)))
+        index_2: int = int(size/2) + floor((y_next - y_start) * size / min(total_thickness, (2 * max_radius)))
         if size > index_1 > 0 and size > index_2 > 0:
             MATRIX[index_1][index_2] += P
 
     # Функция, заполняющая список Cylinder
     def log_at(x, y, P, deepest_z):
-        index_1: int = floor(max_cylinder * (deepest_z / max_depth))
+        index_1: int = floor(max_cylinder * (deepest_z / min(total_thickness, max_depth)))
         index_2: int = floor(max_cylinder * (sqrt(abs(x - x_start) * abs(x - x_start) +
-                                                  abs(y - y_start) * abs(y - y_start)) / max_radius))
+                                                  abs(y - y_start) * abs(y - y_start)) / min(total_thickness/2, max_radius)))
         if index_1 < max_cylinder and index_2 < max_cylinder:
             Cylinder[index_1][index_2] += P
 

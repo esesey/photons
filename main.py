@@ -27,32 +27,29 @@ amount_take = Entry(buttonFrame, textvariable=amount, width=10)
 amount_take.grid(row=4, column=1, padx=3, pady=3)
 amount_tip = Hovertip(amount_take, "от 1 до 100m")
 
-# TODO: Убрать возможность ставить ограничения больше, чем возможно, исходя из толщины сред.
-#  Также синхронизировать значения, показываемые на графиках, с реальными значениями
-
 # Создание панели ввода параметра максимальной глубины
-max_d = DoubleVar(value=20)
-max_d_label = Label(buttonFrame, text="Максимальная глубина")
+max_d = DoubleVar(value=10.1)
+max_d_label = Label(buttonFrame, text="Максимальная глубина (в мм)")
 max_d_label.grid(row=27, column=1)
 max_d_take = Entry(buttonFrame, textvariable=max_d, width=10)
 max_d_take.grid(row=28, column=1, padx=3, pady=3)
-max_d_tip = Hovertip(max_d_take, "от 1 до 200")
+max_d_tip = Hovertip(max_d_take, "от 0,1 до 20")
 
 # Создание панели ввода параметра максимального радиуса
-max_r = DoubleVar(value=20)
-max_r_label = Label(buttonFrame, text="Максимальный радиус")
+max_r = DoubleVar(value=5.05)
+max_r_label = Label(buttonFrame, text="Максимальный радиус (в мм)")
 max_r_label.grid(row=29, column=1)
 max_r_take = Entry(buttonFrame, textvariable=max_r, width=10)
 max_r_take.grid(row=30, column=1, padx=3, pady=3)
-max_r_tip = Hovertip(max_r_take, "от 1 до 100")
+max_r_tip = Hovertip(max_r_take, "от 0,1 до 10")
 
 # Создание панели ввода радиуса для фиксирования
 fix_r = DoubleVar(value=4.9)
-fix_r_label = Label(buttonFrame, text="Зафиксировать радиус")
+fix_r_label = Label(buttonFrame, text="Зафиксировать радиус (в мм)")
 fix_r_label.grid(row=31, column=1)
 fix_r_take = Entry(buttonFrame, textvariable=fix_r, width=10)
 fix_r_take.grid(row=32, column=1, padx=3, pady=3)
-fix_r_tip = Hovertip(fix_r_take, "от 1 до 100")
+fix_r_tip = Hovertip(fix_r_take, "от 0,1 до 10")
 
 # Создание кнопки выбора, показывать ли окно с прогрессом выполнения программы
 # Может быть полезно при разных ситуациях, т.к. прогресс содержит
@@ -81,7 +78,7 @@ def start():
             })
 
     drawing(parameters, int(amount_take.get()), bool(is_show_load.get()),
-            int(max_d.get()), int(max_r_take.get()), float(fix_r_take.get()))
+            float(max_d.get()), float(max_r_take.get()), float(fix_r_take.get()))
 
 
 def takeFromFile():
