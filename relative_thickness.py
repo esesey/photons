@@ -22,17 +22,20 @@ def create_color_layer_presentation(parameters: list[dict[str, float]], c: Canva
         previous_layers_thickness = relative_thickness(cumulative_thickness, total_thickness, canvas_height)
 
         cumulative_thickness += layer["thickness"]
+        if layer["color"]:
+            print(layer["color"])
+            hex_color = layer["color"]
+        else:
+            hue = (index + 1) / len(parameters)
+            # Преобразование HSV в RGB
+            r, g, b = colorsys.hsv_to_rgb(hue, 0.15, 1.0)
 
-        hue = (index + 1) / len(parameters)
-        # Преобразование HSV в RGB
-        r, g, b = colorsys.hsv_to_rgb(hue, 0.15, 1.0)
-
-        # Конвертация в HEX
-        hex_color = "#{:02x}{:02x}{:02x}".format(
-            int(r * 255),
-            int(g * 255),
-            int(b * 255)
-        )
+            # Конвертация в HEX
+            hex_color = "#{:02x}{:02x}{:02x}".format(
+                int(r * 255),
+                int(g * 255),
+                int(b * 255)
+            )
 
         c.create_rectangle(0, previous_layers_thickness, canvas_width, (index + 1) * layer_thickness, fill=hex_color, outline='')
 

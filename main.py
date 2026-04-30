@@ -1,5 +1,5 @@
 from tkinter import *
-from tkinter import ttk
+from tkinter import ttk, colorchooser
 from idlelib.tooltip import Hovertip
 from tkinter.filedialog import askopenfile
 
@@ -11,7 +11,7 @@ from typing import Optional, Dict
 # Создание стартового окна и рамки для кнопок
 window = Tk()
 window.title("Панель управления")
-window.geometry("1024x800")
+window.geometry("1024x840")
 buttonFrame = Frame(window)
 
 # Массив для хранения виджетов слоёв
@@ -77,6 +77,7 @@ def start():
                 "n_out": float(widget["n_out"]["n_out_take"].get()),
                 "g": float(widget["g"]["g_take"].get()),
                 "thickness": float(widget["thickness"]["th_take"].get()),
+                "color": widget["color"].get()
             })
 
     drawing(parameters, int(amount_take.get()), bool(is_show_load.get()),
@@ -110,6 +111,7 @@ def deleteLayer(index):
             widget_info["thickness"]["th_take"].destroy()
             widget_info["buttons"]["button_del"].destroy()
             widget_info["buttons"]["button_add"].destroy()
+            widget_info["buttons"]["button_color"].destroy()
             layers -= 1
             break
 
@@ -124,6 +126,26 @@ def addLayer(initial: Optional[Dict[str, float]] = None):
         "g": 0.9,
         "thickness": 0.1,
     }
+
+    def choose_color():
+        color = colorchooser.askcolor(title="Выберите цвет слоя")
+        if color[1]:
+            color_var.set(color[1])
+            update_preview()
+
+    def update_preview(*args):
+        color = color_var.get()
+        # Проверяем валидность hex-кода
+        if color and color.startswith('#') and len(color) == 7:
+            try:
+                button_color.config(bg=color)
+            except:
+                button_color.config(bg="white")
+        else:
+            button_color.config(bg="white")
+
+    color_var = StringVar()
+    color_var.trace('w', update_preview)
 
     index = layers + 1
     # Создание панели ввода параметра коэффициента рассеяния среды
@@ -182,6 +204,10 @@ def addLayer(initial: Optional[Dict[str, float]] = None):
     button_del = Button(buttonFrame, text="❌ Удалить слой среды", command=lambda: deleteLayer(index))
     button_del.grid(row=18, column=index, padx=10, pady=10)
 
+    # Создание кнопки, с помощью которой можно будет настроить цвет слоя
+    button_color = Button(buttonFrame, text="Выбрать цвет слоя", command=choose_color)
+    button_color.grid(row=19, column=index, padx=10, pady=10)
+
     layer_info = {
         "mu_s": {
             "mu_s_label": mu_s_label,
@@ -215,10 +241,12 @@ def addLayer(initial: Optional[Dict[str, float]] = None):
         },
         "buttons": {
             "button_del": button_del,
-            "button_add": button_add
+            "button_add": button_add,
+            "button_color": button_color
         },
         "index": index,
         "active": True,
+        "color": color_var
     }
 
     widgets.append(layer_info)
@@ -235,7 +263,7 @@ map_label.grid(row=26, column=1, pady=10)
 
 # Создание кнопки, активирующей функцию start
 button2 = Button(buttonFrame, text="Нарисовать траектории", command=start)
-button2.grid(row=19, column=1, padx=10, pady=10)
+button2.grid(row=20, column=1, padx=10, pady=10)
 
 # Создание кнопки, вызывающая функцию takeFromFile
 button3 = Button(buttonFrame, text="Построить карту из файла", command=takeFromFile)
