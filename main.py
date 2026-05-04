@@ -4,6 +4,7 @@ from idlelib.tooltip import Hovertip
 from tkinter.filedialog import askopenfile
 
 from calculation import drawing
+from layer_presets import EPIDERMIS_LAYER_PRESET_940, DERMAL_LAYER_PRESET_940
 from matrix_rebuild import rebuild
 
 from typing import Optional, Dict
@@ -122,6 +123,7 @@ def addLayer(initial: Optional[Dict[str, float]] = None):
         "n_out": 1.0,
         "g": 0.9,
         "thickness": 0.1,
+        "color": ""
     }
 
     def choose_color():
@@ -141,7 +143,7 @@ def addLayer(initial: Optional[Dict[str, float]] = None):
         else:
             button_color.config(bg="white")
 
-    color_var = StringVar()
+    color_var = StringVar(value=values["color"])
     color_var.trace('w', update_preview)
 
     index = layers + 1
@@ -270,22 +272,8 @@ button3.grid(row=33, column=1, padx=10, pady=10)
 button5 = Button(buttonFrame, text="Выйти из программы", command=window.destroy)
 button5.grid(row=34, column=1)
 
-addLayer({
-        "Ms": 33.23,
-        "Ma": 0.199,
-        "n": 1.37,
-        "n_out": 1.0,
-        "g": 0.9,
-        "thickness": 0.1,
-    })
-addLayer({
-        "Ms": 15.44,
-        "Ma": 0.058,
-        "n": 1.4,
-        "n_out": 1.0,
-        "g": 0.9,
-        "thickness": 10,
-    })
+addLayer(EPIDERMIS_LAYER_PRESET_940)
+addLayer(DERMAL_LAYER_PRESET_940)
 
 # Компиляция рамки для кнопок и её прилипание к верхней границе
 buttonFrame.pack(anchor="n")

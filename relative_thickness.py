@@ -22,7 +22,7 @@ def create_color_layer_presentation(parameters: list[dict[str, float]], c: Canva
         previous_layers_thickness = relative_thickness(cumulative_thickness, total_thickness, canvas_height)
 
         cumulative_thickness += layer["thickness"]
-        if layer["color"]:
+        if layer["color"] and layer["color"][0] == "#":
             print(layer["color"])
             hex_color = layer["color"]
         else:
