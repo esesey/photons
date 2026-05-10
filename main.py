@@ -78,8 +78,10 @@ def start():
                 "color": widget["color"].get()
             })
 
-    drawing(parameters, int(amount_take.get()), bool(is_show_load.get()),
-            float(max_d.get()), float(max_r_take.get()), float(fix_r_take.get()))
+    total_thickness = sum(layer["thickness"] for layer in parameters)
+
+    drawing(parameters, int(amount_take.get()), bool(is_show_load.get()), total_thickness,
+            float(max_d_take.get()), float(max_r_take.get()), float(fix_r_take.get()))
 
 
 def takeFromFile():

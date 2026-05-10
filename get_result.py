@@ -29,6 +29,8 @@ def open(
                     ', g = ' + get_field_values_string(parameters, "g")
     fixParametersStr = ', rad = ' + str(rad_size) + ', dep = ' + str(plot_size)
 
+    # TODO: Исправить то, что при создании среды с 5 и более слоями, имя файла становится слишком длинным для сохранения
+    #  Как вариант, можно сохранять спецификацию отдельным файлом, а в имени файла с матрицей давать ссылку на спецификацию.
     numpy.savetxt('archive/matrix_ref ' + '[' + amountStr + parametersStr + fixParametersStr + ']' + '.txt', MATRIX)
     numpy.savetxt('archive/matrix_dis ' + '[' + amountStr + parametersStr + fixParametersStr + ']' + '.txt', Cylinder)
     print("Всего фотонов выпущено:", amount, " Фотонов отражено:", photo_count)

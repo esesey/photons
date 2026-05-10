@@ -27,13 +27,14 @@ def openmatrix(size, cylinder_size, max_depth, max_radius, fix_radius, matrix=[[
             k = []
             i.append(k)
 
-    # Заполнение списков-дублёров данными, логарифмезированными для наглядности
+    # Заполнение списков-дублёров данными, логарифмированными для наглядности
     for jindex in range(size):
         for index in range(size):
             matrix_data[jindex][index] = log(matrix[jindex][index]+0.001)
     for jindex in range(cylinder_size):
         for index in range(cylinder_size):
             cylinder_data[jindex][index] = log(cylinder[jindex][index]+0.001)
+            # TODO: Разобраться, почему многослойная среда не заполняет эти списки
             if index * max_radius / cylinder_size == fix_radius:
                 plot_data_X.append(jindex * max_depth / cylinder_size)
                 plot_data_Y.append(cylinder[jindex][index])

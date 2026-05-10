@@ -7,25 +7,20 @@ from photon import photon_calculation
 from get_result import open
 from relative_thickness import create_color_layer_presentation
 
-
 # Основная функция, использует значения переменных, переданных из главного меню (main.py)
 # Создаёт окно, на котором показываются траектории первых 100 пролетевших фотонов
 # Расчитывает полёт всех фотонов, а так же заносит данные о глубине и весе в соответствующие списки
 def drawing(parameters: list[dict[str, float]], amount: int,
-            is_show_load: bool, max_depth: float, max_radius: float, fix_rad: float):
+            is_show_load: bool, thickness: float, max_depth: float, max_radius: float, fix_rad: float):
     # Инициализация списков обратного отражения, MATRIX для занесения значений веса,
     # Cylinder для значений зависимости глубины пролёта фотона от расстояния до центра пучка
     MATRIX = []
     Cylinder = []
-    # Расчёт длины радиуса цилиндра в зависимости от размера матрицы отражения
-    # max_cylinder = floor(size/2)
+    # Размеры дискретных ячеек в матрицах отражения и глубины
     size = 200
     max_cylinder = 100
 
-    # Расчёт толщины среды
-    total_thickness = sum(layer["thickness"] for layer in parameters)
-
-    # Задание размера списков и заполнение пустыми значениями
+    # Инициализация матриц
     for i in range(size):
         i = []
         MATRIX.append(i)
@@ -37,34 +32,42 @@ def drawing(parameters: list[dict[str, float]], amount: int,
         for j in range(max_cylinder):
             i.append(0)
 
-    # Значения максимальных координат по x,y и z
-    max_x = 200.0
-    max_y = 200.0
-    max_z = 200.0
+    # Константа размера холста
+    canvas_max = 600
 
-    # Начальные x, y и z
-    x_start = 100.0
-    y_start = 100.0
-    z_start = 0.0
-    # Начальные значения направляющих косинусов
-    Gx_start = 0.0
-    Gy_start = 0.0
-    Gz_start = 1.0
+    # Коэффициент для перевода миллиметров в микрометры для большей площади координат.
+    coord_coefficient = 1000
 
-    # Функция, заносящая вес отражённых фотонов в список MATRIX
-    def get_matrix(x_next, y_next, P):
-        index_1: int = int(size/2) + floor((x_next - x_start) * size / min(total_thickness, (2 * max_radius)))
-        index_2: int = int(size/2) + floor((y_next - y_start) * size / min(total_thickness, (2 * max_radius)))
-        if size > index_1 > 0 and size > index_2 > 0:
+    def log_photon(x_next, y_next, x_start, y_start, P, deepest_z):
+        # Расчёт индексов для внесения веса отражённого фотона
+        def get_matrix_reflection_index(coord: float, start_coord: float):
+            center: int = int(size / 2)
+            distantion_coord: float = coord - start_coord
+            distantion: float = distantion_coord/coord_coefficient
+            width: float = min(thickness, (2 * max_radius))
+            index: int = center + floor(distantion * size / width)
+            return index
+
+        index_1: int = get_matrix_reflection_index(x_next, x_start)
+        index_2: int = get_matrix_reflection_index(y_next, y_start)
+        if size > index_1 >= 0 and size > index_2 >= 0:
             MATRIX[index_1][index_2] += P
 
-    # Функция, заполняющая список Cylinder
-    def log_at(x, y, P, deepest_z):
-        index_1: int = floor(max_cylinder * (deepest_z / min(total_thickness, max_depth)))
-        index_2: int = floor(max_cylinder * (sqrt(abs(x - x_start) * abs(x - x_start) +
-                                                  abs(y - y_start) * abs(y - y_start)) / min(total_thickness/2, max_radius)))
+        # Расчёт индексов для внесения веса от глубины отражённого фотона
+        # Индекс максимальной достигнутой глубины
+        depth: float = min(thickness, max_depth)
+        neared_depth_mm: float = deepest_z/coord_coefficient
+        index_1: int = floor(max_cylinder * (neared_depth_mm / depth))
+        # Индекс расстояния от центра
+        x_distantion_sqr = (x_next - x_start) ** 2
+        y_distantion_sqr = (y_next - y_start) ** 2
+        ro_distantion_coord = sqrt(x_distantion_sqr + y_distantion_sqr)
+        ro = ro_distantion_coord/coord_coefficient
+        radius = min(thickness / 2, max_radius)
+        index_2: int = floor(max_cylinder * (ro / radius))
         if index_1 < max_cylinder and index_2 < max_cylinder:
             Cylinder[index_1][index_2] += P
+
 
     # Количество прошедших фотонов
     counter = 0
@@ -126,10 +129,10 @@ def drawing(parameters: list[dict[str, float]], amount: int,
     # Создание главного окна и холста с траекториями
     root = Tk()
     root.title('Траектории')
-    c = Canvas(root, width=600, height=600, bg='white')
+    c = Canvas(root, width=canvas_max, height=canvas_max, bg='white')
     c.pack()
 
-    create_color_layer_presentation(parameters, c, 600, 600)
+    create_color_layer_presentation(parameters, c, canvas_max, canvas_max)
 
     # Создание рамки для кнопок
     dr_frame = Frame(root)
@@ -158,13 +161,7 @@ def drawing(parameters: list[dict[str, float]], amount: int,
             tkinter.messagebox.showinfo(title="Готово!",
                 message="Все фотоны выпущены, можно просматривать результаты")
             
-        result = photon_calculation(
-            c, counter, get_matrix, log_at,
-            x_start, y_start, z_start,
-            Gx_start, Gy_start, Gz_start,
-            max_x, max_y, max_z,
-            parameters
-        )
+        result = photon_calculation(c, counter, log_photon, parameters, thickness, canvas_max, coord_coefficient)
 
         if (result == "get_back"):
             photo_count += 1

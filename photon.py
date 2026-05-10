@@ -9,12 +9,25 @@ from relative_thickness import get_breakpoints
 # Этот модуль посвящён жизненному циклу одного фотона
 
 
-def photon_calculation(c, counter: int, get_matrix, log_at,
-                       x_start: float, y_start: float, z_start: float,
-                       Gx_start: float, Gy_start: float, Gz_start: float,
-                       max_x: float, max_y: float, max_z: float,
-                       parameters: list[dict[str, float]]):
+def photon_calculation(c, counter: int, log_photon,
+                       parameters: list[dict[str, float]], thickness, canvas_max, coord_coefficient):
 
+    # Начальные значения направляющих косинусов
+    Gx_start = 0.0
+    Gy_start = 0.0
+    Gz_start = 1.0
+
+    # Толщина среды является максимальным значением по одной из осей, а поскольку среда рассматривается в виде куба,
+    # каждая из осей будет иметь именно такое максимальное значение.
+    max_x = max_y = max_z = thickness * coord_coefficient
+    x_start = max_x / 2
+    y_start = max_y / 2
+    z_start = 0.0
+
+    # Коэффициент для визуального представления траекторий на холсте.
+    canvas_coefficient = canvas_max/(thickness * coord_coefficient)
+
+    # Брейкпоинты - список из координат по оси z, по которым находится пересечение слоёв среды
     breakpoints = get_breakpoints(parameters, max_z)
 
     n_out_up_list = [
@@ -35,12 +48,8 @@ def photon_calculation(c, counter: int, get_matrix, log_at,
 
     # Зануление наибольшей глубины пролёта фотона
     deepest_z = 0.0
-    # Средняя длина свободного пробега
+    # Средняя длина свободного пробега (в мм)
     length_average = 1.0 / (Ms + Ma)
-
-    total_thickness = sum(layer["thickness"] for layer in parameters)
-    # Коэффициент для перевода величин в миллиметрах в величины в координатах
-    length_koef = max_z/total_thickness
 
     # Текущий вес фотона
     P = 1.0
@@ -53,21 +62,24 @@ def photon_calculation(c, counter: int, get_matrix, log_at,
     x_previous = x_start
     y_previous = y_start
     z_previous = z_start
-    # Предыдущие направляющие косинусы -- направляющие косинусы на старте
+    # Текущие направляющие косинусы -- направляющие косинусы на старте
     current_Gx = Gx_start
     current_Gy = Gy_start
     current_Gz = Gz_start
 
-    # Рассчёт длины свободного пробега на нулевом шаге
+    # Рассчёт длины свободного пробега на нулевом шаге (в мм)
     length = length_average * (- log(1.0 - Epsilon))
     # Рассчёт новых координат на нулевом шаге
-    x_next = x_previous + length * current_Gx
-    y_next = y_previous + length * current_Gy
-    z_next = z_previous + length * current_Gz
+    x_next = x_previous + length * current_Gx * coord_coefficient
+    y_next = y_previous + length * current_Gy * coord_coefficient
+    z_next = z_previous + length * current_Gz * coord_coefficient
 
     # Отрисовка траектории на нулевом шаге, если это один из первых 100 фотонов
     if counter < 100:
-        c.create_line(3 * x_previous, 3 * z_previous, 3 * x_next, 3 * z_next)
+        c.create_line(canvas_coefficient * x_previous,
+                      canvas_coefficient * z_previous,
+                      canvas_coefficient * x_next,
+                      canvas_coefficient * z_next)
 
     # Цикл жизни одного фотона (1 итерация = 1 единичный рассеиватель)
     while P > P_min:
@@ -77,7 +89,7 @@ def photon_calculation(c, counter: int, get_matrix, log_at,
         n_out_up = n_out_up_list[currentLayer - 1]
         n_out_down = n_out_down_list[currentLayer - 1]
         g = parameters[currentLayer - 1]["g"]
-        # Пересчёт длины среднего свободного пробега на случай, если поменялись параметры среды
+        # Пересчёт длины среднего свободного пробега на случай, если поменялись параметры среды (в мм)
         length_average = 1.0 / (Ms + Ma)
         # Изменение веса фотона в единичном рассеивателе
         P_diff = (P * Ma) / (Ms + Ma)
@@ -93,7 +105,7 @@ def photon_calculation(c, counter: int, get_matrix, log_at,
         # Присвоение значения переменной Фи случайно от 0 до 2*пи
         Phi = uniform(0, 2 * pi)
 
-        # Рассчёт случайной длины свободного пробега
+        # Рассчёт случайной длины свободного пробега (в мм)
         Epsilon = uniform(0, 1.0)
         length = length_average * (- log(1.0 - Epsilon))
 
@@ -117,13 +129,16 @@ def photon_calculation(c, counter: int, get_matrix, log_at,
         x_previous = x_next
         y_previous = y_next
         z_previous = z_next
-        x_next = x_previous + length * current_Gx * length_koef
-        y_next = y_previous + length * current_Gy * length_koef
-        z_next = z_previous + length * current_Gz * length_koef
+        x_next = x_previous + length * current_Gx * coord_coefficient
+        y_next = y_previous + length * current_Gy * coord_coefficient
+        z_next = z_previous + length * current_Gz * coord_coefficient
 
         # Отрисовка траектории на этом шаге, если это один из первых 100 фотонов
         if counter < 100:
-            c.create_line(3 * x_previous, 3 * z_previous, 3 * x_next, 3 * z_next)
+            c.create_line(canvas_coefficient * x_previous,
+                          canvas_coefficient * z_previous,
+                          canvas_coefficient * x_next,
+                          canvas_coefficient * z_next)
 
         # Рассеяние: фотон теряет часть "веса"
         P = P - P_diff
@@ -150,12 +165,12 @@ def photon_calculation(c, counter: int, get_matrix, log_at,
                                                                                                          current_Gz, n,
                                                                                                          n_out_up,
                                                                                                          n_out_down,
-                                                                                                         get_matrix,
-                                                                                                         log_at, P,
+                                                                                                         log_photon, P,
                                                                                                          deepest_z,
                                                                                                          breakpoints,
                                                                                                          currentLayer,
-                                                                                                         max_z)
+                                                                                                         max_z, x_start,
+                                                                                                         y_start)
             if action == "get_back":
                 return "get_back"
             elif action == "skip":

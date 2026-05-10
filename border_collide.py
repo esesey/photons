@@ -91,7 +91,7 @@ def calculate_refraction_z(x_previous, y_previous, z_previous, x_next, y_next, z
 
 # Расчёт данных при столкновении с границей по оси z
 def collide_handler_z(x_previous, y_previous, z_previous, x_next, y_next, z_next, minZ, maxZ, current_Gz, n,
-                      n_out_up, n_out_down, get_matrix, log_at, P, deepest_z, breakpoints, currentLayer, max_z):
+                      n_out_up, n_out_down, log_photon, P, deepest_z, breakpoints, currentLayer, max_z, x_start, y_start):
     # Вытаскиваем угол к нормали по z-координате из направляющего косинуса
     Az = acos(current_Gz)
 
@@ -120,8 +120,7 @@ def collide_handler_z(x_previous, y_previous, z_previous, x_next, y_next, z_next
         #       f"acos(Gz)={round(acos(current_Gz) * 57.3, 1):<5.1f}°")
         if z_next <= minZ:
             if z_next <= 0:
-                get_matrix(x_next, y_next, P)
-                log_at(x_next, y_next, P, deepest_z)
+                log_photon(x_next, y_next, x_start, y_start, P, deepest_z)
                 # Возвращаем информацию, что фотон вылетел назад
                 return ("get_back", [current_Gz, x_next, y_next, z_next, minZ, maxZ, currentLayer])
             else:
