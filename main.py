@@ -12,7 +12,7 @@ from typing import Optional, Dict
 # Создание стартового окна и рамки для кнопок
 window = Tk()
 window.title("Панель управления")
-window.geometry("1024x840")
+window.geometry("1024x900")
 buttonFrame = Frame(window)
 
 # Массив для хранения виджетов слоёв
@@ -50,7 +50,15 @@ fix_r_label = Label(buttonFrame, text="Зафиксировать радиус (
 fix_r_label.grid(row=31, column=1)
 fix_r_take = Entry(buttonFrame, textvariable=fix_r, width=10)
 fix_r_take.grid(row=32, column=1, padx=3, pady=3)
-fix_r_tip = Hovertip(fix_r_take, "от 0,1 до 10")
+fix_r_tip = Hovertip(fix_r_take, "от 0,1 до 5")
+
+# Создание панели ввода погрешности фиксирования
+fix_r_acc = DoubleVar(value=5)
+fix_r_acc_label = Label(buttonFrame, text="Допустимая погрешность (в мкм)")
+fix_r_acc_label.grid(row=33, column=1)
+fix_r_acc_take = Entry(buttonFrame, textvariable=fix_r_acc, width=10)
+fix_r_acc_take.grid(row=34, column=1, padx=3, pady=3)
+fix_r_acc_tip = Hovertip(fix_r_acc_take, "от ~0 до 100. Погрешность измерений при фиксации радиуса")
 
 # Создание кнопки выбора, показывать ли окно с прогрессом выполнения программы
 # Может быть полезно при разных ситуациях, т.к. прогресс содержит
@@ -81,7 +89,7 @@ def start():
     total_thickness = sum(layer["thickness"] for layer in parameters)
 
     drawing(parameters, int(amount_take.get()), bool(is_show_load.get()), total_thickness,
-            float(max_d_take.get()), float(max_r_take.get()), float(fix_r_take.get()))
+            float(max_d_take.get()), float(max_r_take.get()), float(fix_r_take.get()), float(fix_r_acc_take.get()))
 
 
 def takeFromFile():
@@ -268,11 +276,11 @@ button2.grid(row=20, column=1, padx=10, pady=10)
 
 # Создание кнопки, вызывающая функцию takeFromFile
 button3 = Button(buttonFrame, text="Построить карту из файла", command=takeFromFile)
-button3.grid(row=33, column=1, padx=10, pady=10)
+button3.grid(row=35, column=1, padx=10, pady=10)
 
 # Создание кнопки, закрывающей основное окно
 button5 = Button(buttonFrame, text="Выйти из программы", command=window.destroy)
-button5.grid(row=34, column=1)
+button5.grid(row=36, column=1)
 
 addLayer(EPIDERMIS_LAYER_PRESET_940)
 addLayer(DERMAL_LAYER_PRESET_940)

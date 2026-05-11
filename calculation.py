@@ -7,11 +7,13 @@ from photon import photon_calculation
 from get_result import open
 from relative_thickness import create_color_layer_presentation
 
+
 # Основная функция, использует значения переменных, переданных из главного меню (main.py)
 # Создаёт окно, на котором показываются траектории первых 100 пролетевших фотонов
 # Расчитывает полёт всех фотонов, а так же заносит данные о глубине и весе в соответствующие списки
 def drawing(parameters: list[dict[str, float]], amount: int,
-            is_show_load: bool, thickness: float, max_depth: float, max_radius: float, fix_rad: float):
+            is_show_load: bool, thickness: float, max_depth: float, max_radius: float,
+            fix_rad: float, fix_rad_acc: float):
     # Инициализация списков обратного отражения, MATRIX для занесения значений веса,
     # Cylinder для значений зависимости глубины пролёта фотона от расстояния до центра пучка
     MATRIX = []
@@ -141,7 +143,7 @@ def drawing(parameters: list[dict[str, float]], amount: int,
     show_button = Button(dr_frame, text="Открыть матрицу отражения", command=lambda: open(
         MATRIX, Cylinder,
         parameters,
-        amount, size, fix_rad, photo_count,
+        amount, size, fix_rad, fix_rad_acc/1000, photo_count,
         max_radius, max_depth, max_cylinder
     ))
     show_button.grid(row=0, column=1, padx=3, pady=3)

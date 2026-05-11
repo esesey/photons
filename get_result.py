@@ -13,7 +13,7 @@ def get_field_values_string(data: list[dict[str, float]], field: str) -> str:
 def open(
         MATRIX, Cylinder,
         parameters: list[dict[str, float]],
-        amount, size, fix_rad, photo_count,
+        amount, size, fix_rad, fix_rad_acc, photo_count,
         max_radius, max_depth, max_cylinder
 ):
     # Расчёт толщины среды
@@ -34,5 +34,5 @@ def open(
     numpy.savetxt('archive/matrix_ref ' + '[' + amountStr + parametersStr + fixParametersStr + ']' + '.txt', MATRIX)
     numpy.savetxt('archive/matrix_dis ' + '[' + amountStr + parametersStr + fixParametersStr + ']' + '.txt', Cylinder)
     print("Всего фотонов выпущено:", amount, " Фотонов отражено:", photo_count)
-    openmatrix(size, max_cylinder, plot_size, rad_size, fix_rad, MATRIX, Cylinder)
+    openmatrix(size, max_cylinder, plot_size, rad_size, fix_rad, MATRIX, Cylinder, fix_rad_acc)
 

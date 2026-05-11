@@ -6,7 +6,8 @@ from utils import gen_sticks_steps
 
 # Функция, выводящая окна с информацией об отражённых назад из среды фотонах
 # Информация берётся напрямую из calculation.py
-def openmatrix(size, cylinder_size, max_depth, max_radius, fix_radius, matrix=[[]], cylinder=[[]]):
+def openmatrix(size, cylinder_size, max_depth, max_radius, fix_radius, matrix=[[]], cylinder=[[]]
+               , fix_radius_accuracy=0.0):
     # Инициализация списков-дублёров переданных списков
     matrix_data = []
     cylinder_data = []
@@ -34,8 +35,7 @@ def openmatrix(size, cylinder_size, max_depth, max_radius, fix_radius, matrix=[[
     for jindex in range(cylinder_size):
         for index in range(cylinder_size):
             cylinder_data[jindex][index] = log(cylinder[jindex][index]+0.001)
-            # TODO: Разобраться, почему многослойная среда не заполняет эти списки
-            if index * max_radius / cylinder_size == fix_radius:
+            if abs((index * max_radius / cylinder_size) - fix_radius) <= fix_radius_accuracy:
                 plot_data_X.append(jindex * max_depth / cylinder_size)
                 plot_data_Y.append(cylinder[jindex][index])
 
