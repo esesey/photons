@@ -5,7 +5,7 @@ from tkinter.filedialog import askopenfile
 
 from calculation import drawing
 from layer_presets import EPIDERMIS_LAYER_PRESET_940, DERMAL_LAYER_PRESET_940
-from matrix_rebuild import rebuild
+from matrix_rebuild import rebuild, rebuild_from_file
 
 from typing import Optional, Dict
 
@@ -97,7 +97,8 @@ def takeFromFile():
     if file is not None:
         content = file.read()
         name = file.name
-        rebuild(name, content, float(fix_r_take.get()))
+        # rebuild(name, content, float(fix_r_take.get()))
+        rebuild_from_file(name, float(fix_r_take.get()))
 
 
 def deleteLayer(index):

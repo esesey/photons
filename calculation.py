@@ -4,7 +4,7 @@ from tkinter import ttk
 from math import sqrt,  floor
 
 from photon import photon_calculation
-from get_result import open
+from get_result import open_
 from relative_thickness import create_color_layer_presentation
 
 
@@ -140,7 +140,7 @@ def drawing(parameters: list[dict[str, float]], amount: int,
     dr_frame = Frame(root)
 
     # Создание кнопки, вызывающей функцию open
-    show_button = Button(dr_frame, text="Открыть матрицу отражения", command=lambda: open(
+    show_button = Button(dr_frame, text="Открыть матрицу отражения", command=lambda: open_(
         MATRIX, Cylinder,
         parameters,
         amount, size, fix_rad, fix_rad_acc/1000, photo_count,
