@@ -5,7 +5,7 @@ from tkinter.filedialog import askopenfile
 
 from calculation import drawing
 from layer_presets import EPIDERMIS_LAYER_PRESET_940, DERMAL_LAYER_PRESET_940, EPIDERMIS_LAYER_PRESET_530, \
-    DERMAL_LAYER_PRESET_530, EPIDERMIS_LAYER_PRESET_655, DERMAL_LAYER_PRESET_655
+    DERMAL_LAYER_PRESET_530, EPIDERMIS_LAYER_PRESET_655, DERMAL_LAYER_PRESET_655, MAIN_GEN_PRESETS
 from matrix_rebuild import rebuild, rebuild_from_file
 
 from typing import Optional, Dict
@@ -91,6 +91,15 @@ def start():
 
     drawing(parameters, int(amount_take.get()), bool(is_show_load.get()), total_thickness,
             float(max_d_take.get()), float(max_r_take.get()), float(fix_r_take.get()), float(fix_r_acc_take.get()))
+
+
+def on_preset_select(_event):
+    selected = presets.get()
+    if selected in list(MAIN_GEN_PRESETS.keys()):
+        for index in range(layers):
+            deleteLayer(index + 1)
+        for layer in MAIN_GEN_PRESETS[selected]["layers"]:
+            addLayer(layer)
 
 
 def takeFromFile():
@@ -272,9 +281,17 @@ info.grid(row=0, column=1, pady=10)
 map_label = Label(buttonFrame, font='Bold', text="Параметры для отрисовки карт")
 map_label.grid(row=26, column=1, pady=10)
 
+presets_label = Label(buttonFrame, text="Выбрать пресет среды:")
+presets_label.grid(row=20, column=1)
+
+# Создание поля выбора пресета среды
+presets = ttk.Combobox(buttonFrame, values=list(MAIN_GEN_PRESETS.keys()), state="readonly", width=40)
+presets.grid(row=21, column=1, padx=10, pady=5)
+presets.bind("<<ComboboxSelected>>", on_preset_select)
+
 # Создание кнопки, активирующей функцию start
 button2 = Button(buttonFrame, text="Нарисовать траектории", command=start)
-button2.grid(row=20, column=1, padx=10, pady=10)
+button2.grid(row=22, column=1, padx=10, pady=10)
 
 # Создание кнопки, вызывающая функцию takeFromFile
 button3 = Button(buttonFrame, text="Построить карту из файла", command=takeFromFile)
