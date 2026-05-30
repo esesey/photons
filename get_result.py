@@ -10,7 +10,7 @@ def open_(
         MATRIX, Cylinder,
         parameters: list[dict[str, float]],
         amount, size, fix_rad, fix_rad_acc, photo_count,
-        max_radius, max_depth, max_cylinder
+        max_radius, max_depth, max_cylinder, velocity
 ):
     # Расчёт толщины среды
     total_thickness = sum(layer["thickness"] for layer in parameters)
@@ -27,7 +27,8 @@ def open_(
         'max_radius': max_radius,
         'max_depth': max_depth,
         'max_cylinder': max_cylinder,
-        'photo_count': photo_count
+        'photo_count': photo_count,
+        'velocity': velocity
     }
 
     spec_str = json.dumps(spec, sort_keys=True)
@@ -42,5 +43,5 @@ def open_(
 
     print(f"Сохранено с хешем: {spec_hash}")
     print("Всего фотонов выпущено:", amount, "Фотонов отражено:", photo_count)
-    openmatrix(size, max_cylinder, plot_size, rad_size, fix_rad, MATRIX, Cylinder, fix_rad_acc)
+    openmatrix(size, max_cylinder, plot_size, rad_size, fix_rad, MATRIX, Cylinder, fix_rad_acc, velocity/amount)
 

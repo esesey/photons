@@ -6,7 +6,7 @@ from tkinter.filedialog import askopenfile
 from calculation import drawing
 from layer_presets import EPIDERMIS_LAYER_PRESET_940, DERMAL_LAYER_PRESET_940, EPIDERMIS_LAYER_PRESET_530, \
     DERMAL_LAYER_PRESET_530, EPIDERMIS_LAYER_PRESET_655, DERMAL_LAYER_PRESET_655, MAIN_GEN_PRESETS
-from matrix_rebuild import rebuild, rebuild_from_file
+from matrix_rebuild import rebuild_from_file
 
 from typing import Optional, Dict
 
@@ -61,6 +61,14 @@ fix_r_acc_take = Entry(buttonFrame, textvariable=fix_r_acc, width=10)
 fix_r_acc_take.grid(row=34, column=1, padx=3, pady=3)
 fix_r_acc_tip = Hovertip(fix_r_acc_take, "от ~0 до 100. Погрешность измерений при фиксации радиуса")
 
+# Создание панели ввода мощности источника
+velocity = DoubleVar(value=4)
+velocity_label = Label(buttonFrame, text="Мощность источника (в Вт)")
+velocity_label.grid(row=35, column=1)
+velocity_take = Entry(buttonFrame, textvariable=velocity, width=10)
+velocity_take.grid(row=36, column=1, padx=3, pady=3)
+velocity_tip = Hovertip(velocity_take, "от 1 до 10. Используется только для отображения данных")
+
 # Создание кнопки выбора, показывать ли окно с прогрессом выполнения программы
 # Может быть полезно при разных ситуациях, т.к. прогресс содержит
 # Интересную информацию, но отнимает производительность
@@ -90,7 +98,8 @@ def start():
     total_thickness = sum(layer["thickness"] for layer in parameters)
 
     drawing(parameters, int(amount_take.get()), bool(is_show_load.get()), total_thickness,
-            float(max_d_take.get()), float(max_r_take.get()), float(fix_r_take.get()), float(fix_r_acc_take.get()))
+            float(max_d_take.get()), float(max_r_take.get()), float(fix_r_take.get()), float(fix_r_acc_take.get()),
+            float(velocity_take.get()))
 
 
 def on_preset_select(_event):
@@ -105,10 +114,8 @@ def on_preset_select(_event):
 def takeFromFile():
     file = askopenfile(parent=buttonFrame, filetypes=[('Text Files', '*.txt')])
     if file is not None:
-        content = file.read()
         name = file.name
-        # rebuild(name, content, float(fix_r_take.get()))
-        rebuild_from_file(name, float(fix_r_take.get()))
+        rebuild_from_file(name, float(fix_r_take.get()), float(fix_r_acc_take.get()))
 
 
 def deleteLayer(index):
@@ -295,11 +302,11 @@ button2.grid(row=22, column=1, padx=10, pady=10)
 
 # Создание кнопки, вызывающая функцию takeFromFile
 button3 = Button(buttonFrame, text="Построить карту из файла", command=takeFromFile)
-button3.grid(row=35, column=1, padx=10, pady=10)
+button3.grid(row=37, column=1, padx=10, pady=10)
 
 # Создание кнопки, закрывающей основное окно
 button5 = Button(buttonFrame, text="Выйти из программы", command=window.destroy)
-button5.grid(row=36, column=1)
+button5.grid(row=38, column=1)
 
 # addLayer(EPIDERMIS_LAYER_PRESET_940)
 addLayer(DERMAL_LAYER_PRESET_940)

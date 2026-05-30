@@ -5,7 +5,7 @@ from numpy import log, histogram, diff
 from utils import gen_sticks_steps
 
 
-def makeWeightMap(size, max_radius, matrix=[[]]):
+def makeWeightMap(size, max_radius, matrix, photon_velocity):
     # Инициализация списка-дублёра переданного списка
     matrix_data = []
 
@@ -27,6 +27,7 @@ def makeWeightMap(size, max_radius, matrix=[[]]):
         return dist
 
     hist_ceils = round(max_radius * sqrt(2)*20)
+    weight_velocity_coef = photon_velocity / (((2 * max_radius) ** 2) / (size ** 2))
 
     # Заполнение списка-дублёра данными, логарифмированными для наглядности
     for jindex in range(size):
@@ -34,7 +35,7 @@ def makeWeightMap(size, max_radius, matrix=[[]]):
             matrix_data[jindex][index] = log(matrix[jindex][index] + 0.001)
             if matrix[jindex][index] > 0:
                 plot_data_X.append(calculate_avg_distantion(jindex, index))
-                plot_data_Y.append(matrix[jindex][index])
+                plot_data_Y.append(matrix[jindex][index] * weight_velocity_coef)
 
     hist_data_Y, hist_data_X = histogram(plot_data_X, bins=hist_ceils, weights=plot_data_Y)
 
@@ -53,11 +54,11 @@ def makeWeightMap(size, max_radius, matrix=[[]]):
     ax2 = figure2.add_subplot(111)
     ax2.set_title(f'Распределение веса от удалённости от источника')
     plt.xlabel('Расстояние до источника, мм')
-    plt.ylabel('Вес фотонов')
+    plt.ylabel('Интенсивность света, Вт/мм²')
 
     ax2.bar(hist_data_X[:-1], hist_data_Y, width=diff(hist_data_X), align='edge')
 
-def makeDepthMap(cylinder_size, max_depth, max_radius, fix_radius, cylinder=[[]], fix_radius_accuracy=0.0):
+def makeDepthMap(cylinder_size, max_depth, max_radius, fix_radius, cylinder, fix_radius_accuracy, photon_velocity):
     # Инициализация списка-дублёра переданного списка
     cylinder_data = []
 
@@ -68,8 +69,10 @@ def makeDepthMap(cylinder_size, max_depth, max_radius, fix_radius, cylinder=[[]]
     plot_data_X4, plot_data_Y4 = [], []
 
     def get_fix_radius_condition(idx, jdx, fix):
-        return abs((idx * max_radius / cylinder_size) - fix) <= fix_radius_accuracy and \
+        return abs((idx * max_radius / cylinder_size) - fix) <= fix_radius_accuracy / 1000 and \
             jdx * max_depth / cylinder_size < 5
+
+    weight_velocity_coef = photon_velocity / (((2 * max_radius) ** 2)/(cylinder_size ** 2))
 
     # Задание размеров списка-дублёра и заполнение пустыми значениями
     for i in range(cylinder_size):
@@ -85,16 +88,16 @@ def makeDepthMap(cylinder_size, max_depth, max_radius, fix_radius, cylinder=[[]]
             cylinder_data[jindex][index] = log(cylinder[jindex][index]+0.001)
             if get_fix_radius_condition(index, jindex, fix_radius):
                 plot_data_X1.append(jindex * max_depth / cylinder_size)
-                plot_data_Y1.append(cylinder[jindex][index])
+                plot_data_Y1.append(cylinder[jindex][index] * weight_velocity_coef)
             if get_fix_radius_condition(index, jindex, fix_radius * 2):
                 plot_data_X2.append(jindex * max_depth / cylinder_size)
-                plot_data_Y2.append(cylinder[jindex][index])
+                plot_data_Y2.append(cylinder[jindex][index] * weight_velocity_coef)
             if get_fix_radius_condition(index, jindex, fix_radius * 3):
                 plot_data_X3.append(jindex * max_depth / cylinder_size)
-                plot_data_Y3.append(cylinder[jindex][index])
+                plot_data_Y3.append(cylinder[jindex][index] * weight_velocity_coef)
             if get_fix_radius_condition(index, jindex, fix_radius * 4):
                 plot_data_X4.append(jindex * max_depth / cylinder_size)
-                plot_data_Y4.append(cylinder[jindex][index])
+                plot_data_Y4.append(cylinder[jindex][index] * weight_velocity_coef)
 
     # Создание фигуры (окна), которая будет хранить данные
     # о распределении глубины пролёта фотона в зависимости от расстояния до центра пучка
@@ -118,19 +121,20 @@ def makeDepthMap(cylinder_size, max_depth, max_radius, fix_radius, cylinder=[[]]
     ax6.plot(plot_data_X3, plot_data_Y3, label=f'r={round(fix_radius*3, 1)}', color='green')
     ax6.plot(plot_data_X4, plot_data_Y4, label=f'r={round(fix_radius*4, 1)}', color='orange')
 
-    ax6.axvspan(0.3, 1.5, alpha=0.15, color='red', label='Кровеносные сосуды')
+    ax6.axvspan(0.3, 1.5, alpha=0.15, color='red', label='Дерма')
 
     plt.xlabel('Глубина, мм')
-    plt.ylabel('Вес фотонов')
+    plt.ylabel('Интенсивность света, Вт/мм²')
     plt.legend()
 
 # Функция, выводящая окна с информацией об отражённых назад из среды фотонах
 # Информация берётся напрямую из calculation.py
-def openmatrix(size, cylinder_size, max_depth, max_radius, fix_radius, matrix=[[]], cylinder=[[]]
-               , fix_radius_accuracy=0.0):
+def openmatrix(size, cylinder_size, max_depth, max_radius, fix_radius, matrix, cylinder, fix_radius_accuracy,
+               photon_velocity):
 
-    makeWeightMap(size, max_radius, matrix)
-    makeDepthMap(cylinder_size, max_depth, max_radius, fix_radius, cylinder, fix_radius_accuracy)
+    makeWeightMap(size, max_radius, matrix, photon_velocity)
+    makeDepthMap(cylinder_size, max_depth, max_radius, fix_radius, cylinder, fix_radius_accuracy, photon_velocity)
+    print(cylinder_size, max_depth, max_radius, fix_radius, cylinder, fix_radius_accuracy, photon_velocity)
 
-    # Зацикливание работы matplotlib.pyplot, чтобы окно с данными не закрывалось без указания пользователя
+    # Зацикливание работы matplotlib, чтобы окно с данными не закрывалось без указания пользователя
     plt.show()

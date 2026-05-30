@@ -13,7 +13,7 @@ from relative_thickness import create_color_layer_presentation
 # Расчитывает полёт всех фотонов, а так же заносит данные о глубине и весе в соответствующие списки
 def drawing(parameters: list[dict[str, float]], amount: int,
             is_show_load: bool, thickness: float, max_depth: float, max_radius: float,
-            fix_rad: float, fix_rad_acc: float):
+            fix_rad: float, fix_rad_acc: float, velocity: float):
     # Инициализация списков обратного отражения, MATRIX для занесения значений веса,
     # Cylinder для значений зависимости глубины пролёта фотона от расстояния до центра пучка
     MATRIX = []
@@ -143,8 +143,8 @@ def drawing(parameters: list[dict[str, float]], amount: int,
     show_button = Button(dr_frame, text="Открыть матрицу отражения", command=lambda: open_(
         MATRIX, Cylinder,
         parameters,
-        amount, size, fix_rad, fix_rad_acc/1000, photo_count,
-        max_radius, max_depth, max_cylinder
+        amount, size, fix_rad, fix_rad_acc, photo_count,
+        max_radius, max_depth, max_cylinder, velocity
     ))
     show_button.grid(row=0, column=1, padx=3, pady=3)
     # Создание кнопки, закрывающей текущее окно с траекториями
