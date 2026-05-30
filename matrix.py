@@ -1,16 +1,66 @@
 import matplotlib.pyplot as plt
-from numpy import log
+from math import sqrt
+from numpy import log, histogram, diff
 
 from utils import gen_sticks_steps
 
 
-# Функция, выводящая окна с информацией об отражённых назад из среды фотонах
-# Информация берётся напрямую из calculation.py
-def openmatrix(size, cylinder_size, max_depth, max_radius, fix_radius, matrix=[[]], cylinder=[[]]
-               , fix_radius_accuracy=0.0):
-    # Инициализация списков-дублёров переданных списков
+def makeWeightMap(size, max_radius, matrix=[[]]):
+    # Инициализация списка-дублёра переданного списка
     matrix_data = []
+
+    # Данные для гистограммы распределения света от источника
+    plot_data_X, plot_data_Y = [], []
+
+    # Задание размеров списка-дублёра и заполнение пустыми значениями
+    for i in range(size):
+        i = []
+        matrix_data.append(i)
+        for j in range(size):
+            k = []
+            i.append(k)
+
+    def calculate_avg_distantion(index1, index2):
+        ind1_dist = (index1 - size / 2) * 2 * max_radius / size
+        ind2_dist = (index2 - size / 2) * 2 * max_radius / size
+        dist = sqrt(ind1_dist**2 + ind2_dist**2)
+        return dist
+
+    hist_ceils = round(max_radius * sqrt(2)*20)
+
+    # Заполнение списка-дублёра данными, логарифмированными для наглядности
+    for jindex in range(size):
+        for index in range(size):
+            matrix_data[jindex][index] = log(matrix[jindex][index] + 0.001)
+            if matrix[jindex][index] > 0:
+                plot_data_X.append(calculate_avg_distantion(jindex, index))
+                plot_data_Y.append(matrix[jindex][index])
+
+    hist_data_Y, hist_data_X = histogram(plot_data_X, bins=hist_ceils, weights=plot_data_Y)
+
+    # Создание фигуры (окна), которая будет хранить данные о весе отражённых фотонов
+    figure1 = plt.figure()
+    ax1 = figure1.add_subplot(111)
+    ax1.set_title("Вес отражённых фотонов")
+    ax1.set_xticklabels(gen_sticks_steps(max_radius * 2))
+    ax1.set_yticklabels(gen_sticks_steps(max_radius * 2))
+    im1 = ax1.pcolormesh(matrix_data, cmap='inferno', antialiased=False)
+    plt.xlabel('Расстояние по оси X, мм')
+    plt.ylabel('Расстояние по оси Y, мм')
+    figure1.colorbar(im1, ax=ax1, label="Натуральный логарифм от веса фотонов")
+
+    figure2 = plt.figure()
+    ax2 = figure2.add_subplot(111)
+    ax2.set_title(f'Распределение веса от удалённости от источника')
+    plt.xlabel('Расстояние до источника, мм')
+    plt.ylabel('Вес фотонов')
+
+    ax2.bar(hist_data_X[:-1], hist_data_Y, width=diff(hist_data_X), align='edge')
+
+def makeDepthMap(cylinder_size, max_depth, max_radius, fix_radius, cylinder=[[]], fix_radius_accuracy=0.0):
+    # Инициализация списка-дублёра переданного списка
     cylinder_data = []
+
     # Данные для четырёх кривых фиксированного радиуса
     plot_data_X1, plot_data_Y1 = [], []
     plot_data_X2, plot_data_Y2 = [], []
@@ -21,14 +71,7 @@ def openmatrix(size, cylinder_size, max_depth, max_radius, fix_radius, matrix=[[
         return abs((idx * max_radius / cylinder_size) - fix) <= fix_radius_accuracy and \
             jdx * max_depth / cylinder_size < 5
 
-
-    # Задание размеров списков-дублёров и заполнение пустыми значениями
-    for i in range(size):
-        i = []
-        matrix_data.append(i)
-        for j in range(size):
-            k = []
-            i.append(k)
+    # Задание размеров списка-дублёра и заполнение пустыми значениями
     for i in range(cylinder_size):
         i = []
         cylinder_data.append(i)
@@ -36,10 +79,7 @@ def openmatrix(size, cylinder_size, max_depth, max_radius, fix_radius, matrix=[[
             k = []
             i.append(k)
 
-    # Заполнение списков-дублёров данными, логарифмированными для наглядности
-    for jindex in range(size):
-        for index in range(size):
-            matrix_data[jindex][index] = log(matrix[jindex][index]+0.001)
+    # Заполнение списка-дублёра данными, логарифмированными для наглядности
     for jindex in range(cylinder_size):
         for index in range(cylinder_size):
             cylinder_data[jindex][index] = log(cylinder[jindex][index]+0.001)
@@ -56,16 +96,6 @@ def openmatrix(size, cylinder_size, max_depth, max_radius, fix_radius, matrix=[[
                 plot_data_X4.append(jindex * max_depth / cylinder_size)
                 plot_data_Y4.append(cylinder[jindex][index])
 
-    # Создание фигуры (окна), которая будет хранить данные о весе отражённых фотонов
-    figure1 = plt.figure()
-    ax1 = figure1.add_subplot(111)
-    ax1.set_title("Вес отражённых фотонов")
-    ax1.set_xticklabels(gen_sticks_steps(max_radius * 2))
-    ax1.set_yticklabels(gen_sticks_steps(max_radius * 2))
-    im1 = ax1.pcolormesh(matrix_data, cmap='inferno', antialiased=False)
-    plt.xlabel('Расстояние по оси X, мм')
-    plt.ylabel('Расстояние по оси Y, мм')
-    figure1.colorbar(im1, ax=ax1, label="Натуральный логарифм от веса фотонов")
     # Создание фигуры (окна), которая будет хранить данные
     # о распределении глубины пролёта фотона в зависимости от расстояния до центра пучка
     figure5 = plt.figure()
@@ -93,6 +123,14 @@ def openmatrix(size, cylinder_size, max_depth, max_radius, fix_radius, matrix=[[
     plt.xlabel('Глубина, мм')
     plt.ylabel('Вес фотонов')
     plt.legend()
+
+# Функция, выводящая окна с информацией об отражённых назад из среды фотонах
+# Информация берётся напрямую из calculation.py
+def openmatrix(size, cylinder_size, max_depth, max_radius, fix_radius, matrix=[[]], cylinder=[[]]
+               , fix_radius_accuracy=0.0):
+
+    makeWeightMap(size, max_radius, matrix)
+    makeDepthMap(cylinder_size, max_depth, max_radius, fix_radius, cylinder, fix_radius_accuracy)
 
     # Зацикливание работы matplotlib.pyplot, чтобы окно с данными не закрывалось без указания пользователя
     plt.show()
