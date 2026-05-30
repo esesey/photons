@@ -4,7 +4,8 @@ from idlelib.tooltip import Hovertip
 from tkinter.filedialog import askopenfile
 
 from calculation import drawing
-from layer_presets import EPIDERMIS_LAYER_PRESET_940, DERMAL_LAYER_PRESET_940
+from layer_presets import EPIDERMIS_LAYER_PRESET_940, DERMAL_LAYER_PRESET_940, EPIDERMIS_LAYER_PRESET_530, \
+    DERMAL_LAYER_PRESET_530, EPIDERMIS_LAYER_PRESET_655, DERMAL_LAYER_PRESET_655
 from matrix_rebuild import rebuild, rebuild_from_file
 
 from typing import Optional, Dict
@@ -45,7 +46,7 @@ max_r_take.grid(row=30, column=1, padx=3, pady=3)
 max_r_tip = Hovertip(max_r_take, "от 0,1 до 10")
 
 # Создание панели ввода радиуса для фиксирования
-fix_r = DoubleVar(value=4.9)
+fix_r = DoubleVar(value=0.4)
 fix_r_label = Label(buttonFrame, text="Зафиксировать радиус (в мм)")
 fix_r_label.grid(row=31, column=1)
 fix_r_take = Entry(buttonFrame, textvariable=fix_r, width=10)
@@ -283,7 +284,7 @@ button3.grid(row=35, column=1, padx=10, pady=10)
 button5 = Button(buttonFrame, text="Выйти из программы", command=window.destroy)
 button5.grid(row=36, column=1)
 
-addLayer(EPIDERMIS_LAYER_PRESET_940)
+# addLayer(EPIDERMIS_LAYER_PRESET_940)
 addLayer(DERMAL_LAYER_PRESET_940)
 
 # Компиляция рамки для кнопок и её прилипание к верхней границе

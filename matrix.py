@@ -11,8 +11,16 @@ def openmatrix(size, cylinder_size, max_depth, max_radius, fix_radius, matrix=[[
     # Инициализация списков-дублёров переданных списков
     matrix_data = []
     cylinder_data = []
-    plot_data_X = []
-    plot_data_Y = []
+    # Данные для четырёх кривых фиксированного радиуса
+    plot_data_X1, plot_data_Y1 = [], []
+    plot_data_X2, plot_data_Y2 = [], []
+    plot_data_X3, plot_data_Y3 = [], []
+    plot_data_X4, plot_data_Y4 = [], []
+
+    def get_fix_radius_condition(idx, jdx, fix):
+        return abs((idx * max_radius / cylinder_size) - fix) <= fix_radius_accuracy and \
+            jdx * max_depth / cylinder_size < 5
+
 
     # Задание размеров списков-дублёров и заполнение пустыми значениями
     for i in range(size):
@@ -35,9 +43,18 @@ def openmatrix(size, cylinder_size, max_depth, max_radius, fix_radius, matrix=[[
     for jindex in range(cylinder_size):
         for index in range(cylinder_size):
             cylinder_data[jindex][index] = log(cylinder[jindex][index]+0.001)
-            if abs((index * max_radius / cylinder_size) - fix_radius) <= fix_radius_accuracy:
-                plot_data_X.append(jindex * max_depth / cylinder_size)
-                plot_data_Y.append(cylinder[jindex][index])
+            if get_fix_radius_condition(index, jindex, fix_radius):
+                plot_data_X1.append(jindex * max_depth / cylinder_size)
+                plot_data_Y1.append(cylinder[jindex][index])
+            if get_fix_radius_condition(index, jindex, fix_radius * 2):
+                plot_data_X2.append(jindex * max_depth / cylinder_size)
+                plot_data_Y2.append(cylinder[jindex][index])
+            if get_fix_radius_condition(index, jindex, fix_radius * 3):
+                plot_data_X3.append(jindex * max_depth / cylinder_size)
+                plot_data_Y3.append(cylinder[jindex][index])
+            if get_fix_radius_condition(index, jindex, fix_radius * 4):
+                plot_data_X4.append(jindex * max_depth / cylinder_size)
+                plot_data_Y4.append(cylinder[jindex][index])
 
     # Создание фигуры (окна), которая будет хранить данные о весе отражённых фотонов
     figure1 = plt.figure()
@@ -63,10 +80,19 @@ def openmatrix(size, cylinder_size, max_depth, max_radius, fix_radius, matrix=[[
 
     figure6 = plt.figure()
     ax6 = figure6.add_subplot(111)
-    ax6.set_title('Распределение веса от глубины при радиусе ' + str(fix_radius))
-    ax6.plot(plot_data_X, plot_data_Y)
+    ax6.set_title(f'Распределение веса от глубины при радиусах {round(fix_radius, 1)}, {round(fix_radius*2, 1)}, '
+                  f'{round(fix_radius*3, 1)}, {round(fix_radius*4, 1)} мм')
+
+    ax6.plot(plot_data_X1, plot_data_Y1, label=f'r={round(fix_radius, 1)}', color='blue')
+    ax6.plot(plot_data_X2, plot_data_Y2, label=f'r={round(fix_radius*2, 1)}', color='red')
+    ax6.plot(plot_data_X3, plot_data_Y3, label=f'r={round(fix_radius*3, 1)}', color='green')
+    ax6.plot(plot_data_X4, plot_data_Y4, label=f'r={round(fix_radius*4, 1)}', color='orange')
+
+    ax6.axvspan(0.3, 1.5, alpha=0.15, color='red', label='Кровеносные сосуды')
+
     plt.xlabel('Глубина, мм')
     plt.ylabel('Вес фотонов')
+    plt.legend()
 
     # Зацикливание работы matplotlib.pyplot, чтобы окно с данными не закрывалось без указания пользователя
     plt.show()
