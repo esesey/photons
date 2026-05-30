@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import json
 import os
+from tkinter import *
 
 from matrix import makeWeightMap, makeDepthMap
 
@@ -14,6 +15,19 @@ def load_specification(spec_hash):
             return json.load(f)
     return None
 
+def parse_spec(spec):
+    ...
+
+def create_info_window():
+    info = Tk()
+    info.title('Информация')
+    info.geometry("250x500")
+    info_frame = Frame(info)
+
+    info_title = Label(info_frame, text="Информация о генерации: ")
+    info_title.grid(row=0, column=0)
+
+    info_frame.pack(anchor="n")
 
 def rebuild_from_file(filepath, fix_radius=None, fix_radius_accuracy=None):
     # Получаем только имя файла без пути
@@ -75,6 +89,7 @@ def rebuild_from_file(filepath, fix_radius=None, fix_radius_accuracy=None):
                 k = float(m_data[i * size + j])
                 z.append(k)
         makeWeightMap(size, rad, matrix_data, velocity/amount)
+        create_info_window()
         plt.show()
 
     elif map_type == 'dis':
@@ -86,9 +101,9 @@ def rebuild_from_file(filepath, fix_radius=None, fix_radius_accuracy=None):
                 z.append(k)
         makeDepthMap(cylinder_size, dep, rad, fix_radius, matrix_data, fix_radius_accuracy, velocity/amount)
         print(cylinder_size, dep, rad, fix_radius, matrix_data, fix_radius_accuracy, velocity/amount)
+        create_info_window()
         plt.show()
 
     else:
         print('Ошибка: неизвестный тип матрицы')
         return
-
