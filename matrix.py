@@ -69,7 +69,8 @@ def makeDepthMap(cylinder_size, max_depth, max_radius, fix_radius, cylinder, fix
     plot_data_X4, plot_data_Y4 = [], []
 
     def get_fix_radius_condition(idx, jdx, fix):
-        return abs((idx * max_radius / cylinder_size) - fix) <= fix_radius_accuracy / 1000 and \
+        return abs((idx * max_radius / cylinder_size) - fix) <= \
+            abs((max_radius / cylinder_size) - (fix_radius_accuracy / 1000)) and \
             jdx * max_depth / cylinder_size < 5
 
     weight_velocity_coef = photon_velocity / (((2 * max_radius) ** 2)/(cylinder_size ** 2))
