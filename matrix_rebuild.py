@@ -100,7 +100,6 @@ def rebuild_from_file(filepath, fix_radius=None, fix_radius_accuracy=None):
                 k = float(m_data[i * cylinder_size + j])
                 z.append(k)
         makeDepthMap(cylinder_size, dep, rad, fix_radius, matrix_data, fix_radius_accuracy, velocity/amount)
-        print(cylinder_size, dep, rad, fix_radius, matrix_data, fix_radius_accuracy, velocity/amount)
         create_info_window()
         plt.show()
 

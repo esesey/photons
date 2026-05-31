@@ -134,7 +134,6 @@ def openmatrix(size, cylinder_size, max_depth, max_radius, fix_radius, matrix, c
 
     makeWeightMap(size, max_radius, matrix, photon_velocity)
     makeDepthMap(cylinder_size, max_depth, max_radius, fix_radius, cylinder, fix_radius_accuracy, photon_velocity)
-    print(cylinder_size, max_depth, max_radius, fix_radius, cylinder, fix_radius_accuracy, photon_velocity)
 
     # Зацикливание работы matplotlib, чтобы окно с данными не закрывалось без указания пользователя
     plt.show()
