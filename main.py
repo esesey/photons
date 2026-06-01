@@ -22,7 +22,7 @@ widgets = []
 layers = 0
 
 # Создание панели ввода параметра количества выпускаемых фотонов
-amount = IntVar(value=100000)
+amount = IntVar(value=10000000)
 amount_label = Label(buttonFrame, text="Кол-во выпускаемых фотонов")
 amount_label.grid(row=3, column=1)
 amount_take = Entry(buttonFrame, textvariable=amount, width=10)
@@ -46,7 +46,7 @@ max_r_take.grid(row=30, column=1, padx=3, pady=3)
 max_r_tip = Hovertip(max_r_take, "от 0,1 до 10")
 
 # Создание панели ввода радиуса для фиксирования
-fix_r = DoubleVar(value=0.5)
+fix_r = DoubleVar(value=0.4)
 fix_r_label = Label(buttonFrame, text="Зафиксировать радиус (в мм)")
 fix_r_label.grid(row=31, column=1)
 fix_r_take = Entry(buttonFrame, textvariable=fix_r, width=10)

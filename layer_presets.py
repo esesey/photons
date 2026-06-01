@@ -81,3 +81,9 @@ MAIN_GEN_PRESETS = {
         "layers": GEN_TWO_LAYER_PRESET_940
     },
 }
+
+Ma_light_map = {
+    "0.21": "530нм",
+    "0.065": "655нм",
+    "0.058": "940нм",
+}
