@@ -16,12 +16,11 @@ def load_specification(spec_hash):
             return json.load(f)
     return None
 
-def parse_spec(spec, fix_radius, fix_radius_accuracy, hash):
+def parse_spec(spec, fix_radius, fix_radius_accuracy, velocity, hash):
     amount = spec.get('amount')
     parameters = spec.get('parameters')
     plot_size = spec.get('plot_size')
     rad_size = spec.get('rad_size')
-    velocity = spec.get('velocity')
 
     layers_count = len(parameters)
     params = f"Количество фотонов: {amount}\n" \
@@ -66,7 +65,7 @@ def create_info_window(information: str):
 
     info_frame.pack(anchor="n")
 
-def rebuild_from_file(filepath, fix_radius=None, fix_radius_accuracy=None):
+def rebuild_from_file(filepath, fix_radius=None, fix_radius_accuracy=None, velocity=None):
     # Получаем только имя файла без пути
     filename = os.path.basename(filepath)
 
@@ -104,7 +103,8 @@ def rebuild_from_file(filepath, fix_radius=None, fix_radius_accuracy=None):
         # Извлекаем параметры из спецификации
         rad = spec.get('rad_size', 0)
         dep = spec.get('plot_size', 0)
-        velocity = spec.get('velocity', 1)
+        if velocity is None:
+            velocity = spec.get('velocity', 1)
         if fix_radius is None:
             fix_radius = spec.get('fix_rad', 0)
         if fix_radius_accuracy is None:
@@ -118,7 +118,7 @@ def rebuild_from_file(filepath, fix_radius=None, fix_radius_accuracy=None):
     m_data = data.split()
     matrix_data = []
 
-    info = parse_spec(spec, fix_radius, fix_radius_accuracy, spec_hash)
+    info = parse_spec(spec, fix_radius, fix_radius_accuracy, velocity, spec_hash)
 
     if map_type == 'ref':
         for i in range(size):

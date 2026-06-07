@@ -4,8 +4,7 @@ from idlelib.tooltip import Hovertip
 from tkinter.filedialog import askopenfile
 
 from calculation import drawing
-from layer_presets import EPIDERMIS_LAYER_PRESET_940, DERMAL_LAYER_PRESET_940, EPIDERMIS_LAYER_PRESET_530, \
-    DERMAL_LAYER_PRESET_530, EPIDERMIS_LAYER_PRESET_655, DERMAL_LAYER_PRESET_655, MAIN_GEN_PRESETS
+from layer_presets import MAIN_GEN_PRESETS
 from matrix_rebuild import rebuild_from_file
 
 from typing import Optional, Dict
@@ -62,12 +61,12 @@ fix_r_acc_take.grid(row=34, column=1, padx=3, pady=3)
 fix_r_acc_tip = Hovertip(fix_r_acc_take, "от ~0 до 100. Погрешность измерений при фиксации радиуса")
 
 # Создание панели ввода мощности источника
-velocity = DoubleVar(value=4)
-velocity_label = Label(buttonFrame, text="Мощность источника (в Вт)")
+velocity = DoubleVar(value=10)
+velocity_label = Label(buttonFrame, text="Мощность источника (в мВт)")
 velocity_label.grid(row=35, column=1)
 velocity_take = Entry(buttonFrame, textvariable=velocity, width=10)
 velocity_take.grid(row=36, column=1, padx=3, pady=3)
-velocity_tip = Hovertip(velocity_take, "от 1 до 10. Используется только для отображения данных")
+velocity_tip = Hovertip(velocity_take, "от 1 до 15. Используется только для отображения данных")
 
 # Создание кнопки выбора, показывать ли окно с прогрессом выполнения программы
 # Может быть полезно при разных ситуациях, т.к. прогресс содержит
@@ -115,7 +114,7 @@ def takeFromFile():
     file = askopenfile(parent=buttonFrame, filetypes=[('Text Files', '*.txt')])
     if file is not None:
         name = file.name
-        rebuild_from_file(name, float(fix_r_take.get()), float(fix_r_acc_take.get()))
+        rebuild_from_file(name, float(fix_r_take.get()), float(fix_r_acc_take.get()), float(velocity_take.get()))
 
 
 def deleteLayer(index):
@@ -307,9 +306,6 @@ button3.grid(row=37, column=1, padx=10, pady=10)
 # Создание кнопки, закрывающей основное окно
 button5 = Button(buttonFrame, text="Выйти из программы", command=window.destroy)
 button5.grid(row=38, column=1)
-
-# addLayer(EPIDERMIS_LAYER_PRESET_940)
-# addLayer(DERMAL_LAYER_PRESET_940)
 
 # Компиляция рамки для кнопок и её прилипание к верхней границе
 buttonFrame.pack(anchor="n")

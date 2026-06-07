@@ -1,8 +1,15 @@
 import matplotlib.pyplot as plt
 from math import sqrt
+
 from numpy import log, histogram, diff
 
 from utils import gen_sticks_steps
+
+
+def getVelocityOnSquare(photon_velocity, width, ceil_count):
+    ceil_width = width/ceil_count
+    velocity_on_square = photon_velocity/(ceil_width**2)
+    return velocity_on_square
 
 
 def makeWeightMap(size, max_radius, matrix, photon_velocity):
@@ -27,7 +34,7 @@ def makeWeightMap(size, max_radius, matrix, photon_velocity):
         return dist
 
     hist_ceils = round(max_radius * sqrt(2)*20)
-    weight_velocity_coef = photon_velocity / (((2 * max_radius) ** 2) / (size ** 2))
+    weight_velocity_coef = getVelocityOnSquare(photon_velocity, 2 * max_radius, size)
 
     # Заполнение списка-дублёра данными, логарифмированными для наглядности
     for jindex in range(size):
@@ -42,7 +49,7 @@ def makeWeightMap(size, max_radius, matrix, photon_velocity):
     # Создание фигуры (окна), которая будет хранить данные о весе отражённых фотонов
     figure1 = plt.figure()
     ax1 = figure1.add_subplot(111)
-    ax1.set_title("Вес отражённых фотонов")
+    # ax1.set_title("Вес отражённых фотонов")
     ax1.set_xticklabels(gen_sticks_steps(max_radius * 2))
     ax1.set_yticklabels(gen_sticks_steps(max_radius * 2))
     im1 = ax1.pcolormesh(matrix_data, cmap='inferno', antialiased=False)
@@ -52,11 +59,12 @@ def makeWeightMap(size, max_radius, matrix, photon_velocity):
 
     figure2 = plt.figure()
     ax2 = figure2.add_subplot(111)
-    ax2.set_title(f'Распределение веса от удалённости от источника')
+    # ax2.set_title(f'Распределение веса от удалённости от источника')
     plt.xlabel('Расстояние до источника, мм')
-    plt.ylabel('Интенсивность света, Вт/мм²')
+    plt.ylabel('Интенсивность света, мВт/мм²')
 
     ax2.bar(hist_data_X[:-1], hist_data_Y, width=diff(hist_data_X), align='edge')
+
 
 def makeDepthMap(cylinder_size, max_depth, max_radius, fix_radius, cylinder, fix_radius_accuracy, photon_velocity):
     # Инициализация списка-дублёра переданного списка
@@ -72,7 +80,7 @@ def makeDepthMap(cylinder_size, max_depth, max_radius, fix_radius, cylinder, fix
         return abs((idx * round(max_radius) / cylinder_size) - fix) <= fix_radius_accuracy/1000 and \
             jdx * max_depth / cylinder_size < 5
 
-    weight_velocity_coef = photon_velocity / (((2 * max_radius) ** 2)/(cylinder_size ** 2))
+    weight_velocity_coef = getVelocityOnSquare(photon_velocity, 2 * max_radius, cylinder_size)
 
     # Задание размеров списка-дублёра и заполнение пустыми значениями
     for i in range(cylinder_size):
@@ -103,29 +111,28 @@ def makeDepthMap(cylinder_size, max_depth, max_radius, fix_radius, cylinder, fix
     # о распределении глубины пролёта фотона в зависимости от расстояния до центра пучка
     figure5 = plt.figure()
     ax5 = figure5.add_subplot(111)
-    ax5.set_title("Распределение глубины по циллиндру")
-    ax5.set_xticklabels(gen_sticks_steps(max_depth, 5))
-    ax5.set_yticklabels(gen_sticks_steps(max_radius, 5))
+    ax5.set_xticklabels(gen_sticks_steps(max_radius, 5))
+    ax5.set_yticklabels(gen_sticks_steps(max_depth, 5))
     im5 = ax5.pcolormesh(cylinder_data, cmap='inferno', antialiased=False)
-    plt.xlabel('Глубина, мм')
-    plt.ylabel('Расстояние до центра пучка, мм')
+    plt.xlabel('Расстояние до центра пучка, мм')
+    plt.ylabel('Глубина, мм')
     figure5.colorbar(im5, ax=ax5, label="Натуральный логарифм от веса фотонов")
 
     figure6 = plt.figure()
     ax6 = figure6.add_subplot(111)
-    ax6.set_title(f'Распределение веса от глубины при радиусах {round(fix_radius, 1)}, {round(fix_radius*2, 1)}, '
-                  f'{round(fix_radius*3, 1)}, {round(fix_radius*4, 1)} мм')
+    # ax6.set_title(f'Распределение веса от глубины при радиусе {round(fix_radius, 1)} мм')
 
-    ax6.plot(plot_data_X1, plot_data_Y1, label=f'r={round(fix_radius, 1)}', color='blue')
-    ax6.plot(plot_data_X2, plot_data_Y2, label=f'r={round(fix_radius*2, 1)}', color='red')
-    ax6.plot(plot_data_X3, plot_data_Y3, label=f'r={round(fix_radius*3, 1)}', color='green')
-    ax6.plot(plot_data_X4, plot_data_Y4, label=f'r={round(fix_radius*4, 1)}', color='orange')
+    ax6.plot(plot_data_X1, plot_data_Y1, label=f'r = {round(fix_radius, 1)}мм', color='blue')
+    ax6.plot(plot_data_X2, plot_data_Y2, label=f'r = {round(fix_radius*2, 1)}мм', color='red')
+    ax6.plot(plot_data_X3, plot_data_Y3, label=f'r = {round(fix_radius*3, 1)}мм', color='green')
+    ax6.plot(plot_data_X4, plot_data_Y4, label=f'r = {round(fix_radius*4, 1)}мм', color='orange')
 
-    ax6.axvspan(0.3, 1.5, alpha=0.15, color='red', label='Дерма')
+    ax6.axvspan(0.3, 1.5, alpha=0.15, color='red', label='Кровенаполненные слои')
 
     plt.xlabel('Глубина, мм')
-    plt.ylabel('Интенсивность света, Вт/мм²')
+    plt.ylabel('Интенсивность света, мВт/мм²')
     plt.legend()
+
 
 # Функция, выводящая окна с информацией об отражённых назад из среды фотонах
 # Информация берётся напрямую из calculation.py
